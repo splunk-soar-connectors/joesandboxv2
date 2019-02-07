@@ -1,0 +1,21 @@
+<!-- File: readme.html
+  Copyright (c) 2019 Splunk Inc.
+
+  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+  without a valid written license from Splunk Inc. is PROHIBITED.
+-->
+
+<p>Below points explain the functioning of the <b>report_cache</b> parameter for the actions <b>detonate file</b> and <b>detonate url</b>
+<br><br>
+<b>Detonate File</b>
+  <ul>
+    <li>If caching is enabled and cookbook is provided, then, the caching is ignored and a new detonation analysis process is spawned always on Joe Sandbox</li>
+    <li>If caching is enabled and cookbook is not provided, then, the analysis report of the latest spawned process on Joe Sandbox for the provided file hash, is returned</li>
+    <li>If caching is not enabled, then, always a new detonation analysis process is spawned on Joe Sandbox for the provided file hash</li>
+  </ul>
+<b>Detonate URL</b>
+  <ul>
+    <li>If caching is enabled, then, the analysis report of the latest spawned process on Joe Sandbox for the provided URL, is returned</li>
+    <li>If caching is not enabled, then, always a new detonation analysis process is spawned on Joe Sandbox for the provided URL</li>
+  </ul>
+</p>
