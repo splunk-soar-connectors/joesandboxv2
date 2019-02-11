@@ -85,7 +85,7 @@
                     ],
                     "order": 1
                 },
-                "inet_access": {
+                "internet_access": {
                     "description": "Allow full internet access",
                     "data_type": "boolean",
                     "default": false,
@@ -120,7 +120,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.inet_access",
+                    "data_path": "action_result.parameter.internet_access",
                     "data_type": "boolean",
                     "example_values": [
                         false,
@@ -2931,7 +2931,7 @@
                     "data_type": "ph",
                     "order": 1
                 },
-                "inet_access": {
+                "internet_access": {
                     "description": "Allow full internet access",
                     "data_type": "boolean",
                     "required": false,
@@ -2957,7 +2957,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.inet_access",
+                    "data_path": "action_result.parameter.internet_access",
                     "data_type": "boolean",
                     "example_values": [
                         false,

@@ -846,15 +846,13 @@ class JoeSandboxV2Connector(BaseConnector):
             json_response_filter_data[JOE_JSON_SYSTEM_BEHAVIOR] = []
 
             # If path to get system behavior data is available, then converting it into list if it is an object
-            if json_response_data.get(JOE_JSON_ANALYSIS, {}).get(JOE_JSON_BEHAVIOR, {}).get(JOE_JSON_SYSTEM, {}).get(JOE_JSON_PROCESSES, {}).get(
-                    JOE_JSON_PROCESS, []):
-                if isinstance(json_response_data[JOE_JSON_ANALYSIS][JOE_JSON_BEHAVIOR][JOE_JSON_SYSTEM][JOE_JSON_PROCESSES][JOE_JSON_PROCESS], dict):
-                    json_response_data[JOE_JSON_ANALYSIS][JOE_JSON_BEHAVIOR][JOE_JSON_SYSTEM][JOE_JSON_PROCESSES][JOE_JSON_PROCESS] = \
-                        [json_response_data[JOE_JSON_ANALYSIS][JOE_JSON_BEHAVIOR][JOE_JSON_SYSTEM][JOE_JSON_PROCESSES][JOE_JSON_PROCESS]]
+            behavior_data = json_response_data.get(JOE_JSON_ANALYSIS, {}).get(JOE_JSON_BEHAVIOR, {}).get(JOE_JSON_SYSTEM, {}).get(JOE_JSON_PROCESSES, {}).get(JOE_JSON_PROCESS, [])
+            if behavior_data:
+                if isinstance(behavior_data, dict):
+                    json_response_data[JOE_JSON_ANALYSIS][JOE_JSON_BEHAVIOR][JOE_JSON_SYSTEM][JOE_JSON_PROCESSES][JOE_JSON_PROCESS] = [behavior_data]
 
                 # Iterating over system behavior keys to get data related to file activities and registry activities
-                for system_behavior_data in json_response_data[JOE_JSON_ANALYSIS][JOE_JSON_BEHAVIOR][JOE_JSON_SYSTEM][JOE_JSON_PROCESSES][
-                        JOE_JSON_PROCESS]:
+                for system_behavior_data in behavior_data:
 
                     # Getting general information of module
                     system_behavior_module_data = {JOE_JSON_GENERAL: system_behavior_data.get(JOE_JSON_GENERAL)}
