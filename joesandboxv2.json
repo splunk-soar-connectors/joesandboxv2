@@ -8,7 +8,7 @@
     "logo_dark": "logo_joesandboxv2_dark.svg",
     "product_name": "Joe Sandbox v2",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "license": "Copyright (c) 2019 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2019-01-25T08:13:35.905457Z",
