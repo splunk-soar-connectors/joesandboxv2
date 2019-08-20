@@ -14,9 +14,9 @@ import requests
 import json
 import math
 import time
-import tempfile
 import shutil
 import os
+import uuid
 import urllib
 from bs4 import BeautifulSoup
 from joesandboxv2_consts import *
@@ -537,7 +537,9 @@ class JoeSandboxV2Connector(BaseConnector):
             if hasattr(Vault, 'get_vault_tmp_dir'):
                 temp_dir = Vault.get_vault_tmp_dir()
             else:
-                temp_dir = tempfile.mkdtemp()
+                temp_dir = 'opt/phantom/vault/tmp'
+            temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
+            os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, filename)
             with open(file_path, 'wb') as file_obj:
                 file_obj.write(content)
@@ -549,6 +551,10 @@ class JoeSandboxV2Connector(BaseConnector):
             # Check if report with same file name is already available in vault
             vault_list = Vault.get_file_info(container_id=container_id)
         except Exception as e:
+            try:
+                shutil.rmtree(temp_dir)
+            except Exception as e:
+                pass
             return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details from Phantom. Details: {0}'.format(str(e))), None)
 
         # Iterate through each vault item in the container and compare name and size of file
@@ -558,6 +564,11 @@ class JoeSandboxV2Connector(BaseConnector):
                 vault_details = {phantom.APP_JSON_VAULT_ID: vault.get(JOE_JSON_FILE_VAULT_ID),
                                  JOE_JSON_REPORT_FILE_NAME: filename}
 
+                try:
+                    shutil.rmtree(temp_dir)
+                except Exception as e:
+                    pass
+
                 return phantom.APP_SUCCESS, vault_details
 
         # Calling move_file_to_vault to move downloaded file to current container's vault
@@ -565,7 +576,11 @@ class JoeSandboxV2Connector(BaseConnector):
                                                              filename, action_result)
 
         if phantom.is_fail(return_val):
-            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_ADDING_TO_VAULT_FAILED_MSG)
+            try:
+                shutil.rmtree(temp_dir)
+            except Exception as e:
+                pass
+            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_ADDING_TO_VAULT_FAILED_MSG), None
 
         # Removing temporary directory created to download file
         try:
