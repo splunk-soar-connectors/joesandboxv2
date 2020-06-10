@@ -1,5 +1,5 @@
 # File: joesandboxv2_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -17,9 +17,9 @@ import time
 import shutil
 import os
 import uuid
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup
-from joesandboxv2_consts import *
+from .joesandboxv2_consts import *
 
 
 class RetVal(tuple):
@@ -50,8 +50,8 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: parsed response
         """
 
-        for key, value in response.iteritems():
-            if isinstance(value, (str, unicode)):
+        for key, value in response.items():
+            if isinstance(value, str):
                 response[key] = value.strip(';')
 
         return response
@@ -156,8 +156,8 @@ class JoeSandboxV2Connector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_SUCCESS), {JOE_JSON_RESPONSE: response_data, JOE_JSON_RESPONSE_HEADERS: response.headers})
 
         # You should process the error returned in the json
-        message = u'Error from server. Status Code: {0}, Detail: {1} and Reason: {2}'.format(
-                response.status_code, JOE_ERR_UNKNOWN_ERROR_MSG, response.text.replace(u'{', u'{{').replace(u'}', u'}}'))
+        message = 'Error from server. Status Code: {0}, Detail: {1} and Reason: {2}'.format(
+                response.status_code, JOE_ERR_UNKNOWN_ERROR_MSG, response.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -194,7 +194,7 @@ class JoeSandboxV2Connector(BaseConnector):
             return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
-        message = u"Can't process response from server. Status Code: {0} Data from server: {1}".format(
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
                 r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -314,7 +314,7 @@ class JoeSandboxV2Connector(BaseConnector):
                 file_obj = open(Vault.get_file_path(file_vault_id), 'rb').read()
                 # Obtain file name
                 file_name = file_data[JOE_JSON_NAME]
-                file_params[JOE_JSON_SAMPLE] = (urllib.quote(file_name.encode('utf-8')), file_obj)
+                file_params[JOE_JSON_SAMPLE] = (urllib.parse.quote(file_name.encode('utf-8')), file_obj)
 
             elif file_data[JOE_JSON_FILE_VAULT_ID] == cookbook_vault_id and \
                     detonate_file_type == JOE_JSON_COOKBOOK:
@@ -322,7 +322,7 @@ class JoeSandboxV2Connector(BaseConnector):
                 cookbook_obj = open(Vault.get_file_path(cookbook_vault_id), 'rb').read()
                 # Obtain cookbook name
                 cookbook_name = file_data[JOE_JSON_NAME]
-                file_params[JOE_JSON_COOKBOOK] = (urllib.quote(cookbook_name.encode('utf-8')), cookbook_obj)
+                file_params[JOE_JSON_COOKBOOK] = (urllib.parse.quote(cookbook_name.encode('utf-8')), cookbook_obj)
 
             # If type = 'file', 'sample' key must be there in file_params dict
             # If type = 'cookbook', 'sample' and 'cookbook' keys must be there in file_params dict
@@ -821,7 +821,7 @@ class JoeSandboxV2Connector(BaseConnector):
             return action_result.get_status(), None
 
         if JOE_JSON_RESPONSE in response_data:
-            if isinstance(response_data[JOE_JSON_RESPONSE], basestring):
+            if isinstance(response_data[JOE_JSON_RESPONSE], str):
                 try:
                     response_data[JOE_JSON_RESPONSE] = json.loads(response_data[JOE_JSON_RESPONSE])
                 except Exception as e:
@@ -844,7 +844,7 @@ class JoeSandboxV2Connector(BaseConnector):
         if response_data.get(JOE_JSON_RESPONSE):
             json_response_data = response_data[JOE_JSON_RESPONSE]
 
-            for key, subkey in overview_info_keys.iteritems():
+            for key, subkey in overview_info_keys.items():
                 # To check if each parent key's subkey that will be considered to display the widget, is a list. If
                 # not, then it will be converted into list
                 if json_response_data[JOE_JSON_ANALYSIS].get(key) and subkey:
@@ -871,7 +871,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
                     # Getting general information of module
                     system_behavior_module_data = {JOE_JSON_GENERAL: system_behavior_data.get(JOE_JSON_GENERAL)}
-                    for key, sub_key_list in system_behavior_info_keys.iteritems():
+                    for key, sub_key_list in system_behavior_info_keys.items():
                         for sub_key in sub_key_list:
                             if system_behavior_data.get(key, {}).get(sub_key, {}).get(JOE_JSON_CALL):
                                 # To check if each parent key's subkey that will be considered to display the widget
@@ -880,7 +880,7 @@ class JoeSandboxV2Connector(BaseConnector):
                                     system_behavior_data[key][sub_key][JOE_JSON_CALL] = [
                                         system_behavior_data[key][sub_key][JOE_JSON_CALL]
                                     ]
-                                if key not in system_behavior_module_data.keys():
+                                if key not in list(system_behavior_module_data.keys()):
                                     system_behavior_module_data[key] = dict()
 
                                 system_behavior_module_data[key][sub_key] = system_behavior_data[key][sub_key][
@@ -1105,7 +1105,7 @@ class JoeSandboxV2Connector(BaseConnector):
         action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
 
-        if action in action_mapping.keys():
+        if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
             action_execution_status = action_function(param)
 
@@ -1201,13 +1201,13 @@ if __name__ == '__main__':
             r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {0}".format(str(e)))
+            print(("Unable to get session id from the platform. Error: {0}".format(str(e))))
             exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print(json.dumps(in_json, indent=4))
+        print((json.dumps(in_json, indent=4)))
 
         connector = JoeSandboxV2Connector()
         connector.print_progress_message = True
@@ -1217,6 +1217,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print((json.dumps(json.loads(ret_val), indent=4)))
 
     exit(0)
