@@ -19,7 +19,7 @@ import os
 import uuid
 import urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup
-from .joesandboxv2_consts import *
+from joesandboxv2_consts import *
 
 
 class RetVal(tuple):
