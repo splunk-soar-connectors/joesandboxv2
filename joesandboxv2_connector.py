@@ -541,7 +541,7 @@ class JoeSandboxV2Connector(BaseConnector):
             temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
             os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, filename)
-            with open(file_path, 'wb') as file_obj:
+            with open(file_path, 'w') as file_obj:
                 file_obj.write(content)
         except Exception as e:
             self.debug_print(JOE_ERR_FILE_MSG)
