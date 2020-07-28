@@ -532,6 +532,11 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        if isinstance(content, bytes):
+            open_mode = 'wb'
+        else:
+            open_mode = 'w'
+
         # Creating temporary directory and file
         try:
             if hasattr(Vault, 'get_vault_tmp_dir'):
@@ -541,7 +546,7 @@ class JoeSandboxV2Connector(BaseConnector):
             temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
             os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, filename)
-            with open(file_path, 'w') as file_obj:
+            with open(file_path, open_mode) as file_obj:
                 file_obj.write(content)
         except Exception as e:
             self.debug_print(JOE_ERR_FILE_MSG)
