@@ -826,7 +826,7 @@ class JoeSandboxV2Connector(BaseConnector):
             return action_result.get_status(), None
 
         if JOE_JSON_RESPONSE in response_data:
-            if isinstance(response_data[JOE_JSON_RESPONSE], str):
+            if isinstance(response_data[JOE_JSON_RESPONSE], (str, bytes)):
                 try:
                     response_data[JOE_JSON_RESPONSE] = json.loads(response_data[JOE_JSON_RESPONSE])
                 except Exception as e:
