@@ -610,13 +610,14 @@ class JoeSandboxV2Connector(BaseConnector):
         except IOError as e:
             error_msg = self._get_error_message_from_exception(e)
             try:
-                if "File name too long" in error_msg:
+                # Handling "Filename too long"/"File name too long"
+                if "too long" in error_msg:
                     random_suffix = uuid.uuid4()
                     new_file_name = "long_filename_{}".format(self._handle_py_ver_compat_for_input_str(random_suffix))
                     file_path = os.path.join(temp_dir, new_file_name)
                     self.debug_print("Original filename: {}".format(self._handle_py_ver_compat_for_input_str(filename)))
                     self.debug_print("Modified filename: {}".format(new_file_name))
-                    with open(file_path, 'wb') as _temp_file:
+                    with open(file_path, open_mode) as _temp_file:
                         _temp_file.write(content)
                 else:
                     return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error Details:{}".format(
