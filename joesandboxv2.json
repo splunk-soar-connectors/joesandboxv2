@@ -14,7 +14,7 @@
     "utctime_updated": "2020-09-15T20:41:40.000000Z",
     "package_name": "phantom_joesandboxv2",
     "main_module": "joesandboxv2_connector.py",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "python_version": "3",
     "latest_tested_versions": [
@@ -37,14 +37,12 @@
         "timeout": {
             "description": "Detonation timeout (30-300 seconds)",
             "data_type": "numeric",
-            "required": false,
             "default": 120,
             "order": 2
         },
         "analysis_time": {
             "description": "Maximum time to complete detonation analysis (30-300 seconds)",
             "data_type": "numeric",
-            "required": false,
             "default": 120,
             "order": 3
         }
@@ -64,6 +62,7 @@
             "action": "detonate file",
             "identifier": "detonate_file",
             "description": "Retrieve detonation analysis results for file",
+            "verbose": "If report_cache is enabled, action checks the cache for existing reports before running a full analysis and returns the latest analysis report from the cache. If disabled, it always spawns a new analysis.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -81,7 +80,6 @@
                 "cookbook_vault_id": {
                     "description": "Vault ID of cookbook script",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "vault id",
@@ -97,7 +95,6 @@
                 },
                 "report_cache": {
                     "description": "Enable the report cache",
-                    "verbose": "This option if enabled, checks the cache for existing reports before running a full analysis and returns the latest analysis report from the cache. If disabled, it always spawns a new analysis.",
                     "data_type": "boolean",
                     "default": false,
                     "order": 3
@@ -231,10 +228,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.ole.archive.zip",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.preview",
@@ -832,10 +826,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.sample_status.runs.*.error",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sample_status.runs.*.system",
@@ -1075,7 +1066,6 @@
                     "description": "Type of report",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "html",
                         "xml",
@@ -1097,7 +1087,6 @@
                         "misp",
                         "graphreports",
                         "pdf",
-                        "openioc",
                         "bins",
                         "unpackpe",
                         "unpack",
@@ -1385,10 +1374,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.entropy",
@@ -1464,10 +1450,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.pe.datadirs.datadir.*.insection",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.pe.datadirs.datadir.*.name",
@@ -1485,10 +1468,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.pe.dllcharacteristics",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.pe.entrypoint",
@@ -1541,10 +1521,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.pe.exports",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.pe.fileversion.major",
@@ -1828,10 +1805,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.pe.tls",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo.pe.versions.@isArray",
@@ -2609,7 +2583,6 @@
                     "data_path": "action_result.data.*.sample_details.system_behavior.*.registryactivities.keyValueModified.*.newdataascii",
                     "data_type": "string",
                     "example_values": [
-                        "",
                         "....\""
                     ]
                 },
@@ -2746,10 +2719,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.comments",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.duration",
@@ -2916,6 +2886,7 @@
             "action": "detonate url",
             "identifier": "detonate_url",
             "description": "Retrieve detonation analysis results for URL",
+            "verbose": "If report_cache is enabled, action checks the cache for existing reports before running a full analysis and returns the latest analysis report from the cache. If disabled, it always spawns a new analysis.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -2938,14 +2909,11 @@
                 "internet_access": {
                     "description": "Allow full internet access",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "default": false,
                     "order": 2
                 },
                 "report_cache": {
                     "description": "Enable the report cache",
-                    "verbose": "This option if enabled, checks the cache for existing reports before running a full analysis and returns the latest analysis report from the cache. If disabled, it always spawns a new analysis.",
                     "data_type": "boolean",
                     "default": false,
                     "order": 3
@@ -3206,10 +3174,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.fileinfo",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.generalinfo.analysisstopreason",
@@ -3878,10 +3843,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.system_behavior.*.registryactivities.keyValueModified.*.newdataascii",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sample_details.system_behavior.*.registryactivities.keyValueModified.*.olddata",
@@ -4119,10 +4081,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.comments",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.duration",
@@ -4151,10 +4110,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.runs.*.error",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.runs.*.system",
@@ -4313,10 +4269,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.comments",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.duration",
@@ -4367,10 +4320,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.runs.*.error",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.runs.*.system",
@@ -4608,10 +4558,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.comments",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.cookbook_file_name",
