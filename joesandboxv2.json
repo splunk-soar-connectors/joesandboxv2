@@ -4045,11 +4045,6 @@
                     "order": 0
                 }
             },
-            "render": {
-                "type": "table",
-                "title": "URL Reputation"
-            },
-            "versions": "EQ(*)",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -4208,7 +4203,12 @@
                         2
                     ]
                 }
-            ]
+            ],
+            "render": {
+                "type": "table",
+                "title": "URL Reputation"
+            },
+            "versions": "EQ(*)"
         },
         {
             "action": "file reputation",
@@ -4231,11 +4231,6 @@
                     "order": 0
                 }
             },
-            "render": {
-                "type": "table",
-                "title": "File Reputation"
-            },
-            "versions": "EQ(*)",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -4431,7 +4426,12 @@
                         1
                     ]
                 }
-            ]
+            ],
+            "render": {
+                "type": "table",
+                "title": "File Reputation"
+            },
+            "versions": "EQ(*)"
         },
         {
             "action": "list cookbooks",
@@ -4440,11 +4440,6 @@
             "identifier": "list_cookbooks",
             "read_only": true,
             "parameters": {},
-            "render": {
-                "type": "table",
-                "title": "List Cookbooks"
-            },
-            "versions": "EQ(*)",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -4503,7 +4498,12 @@
                         1
                     ]
                 }
-            ]
+            ],
+            "render": {
+                "type": "table",
+                "title": "List Cookbooks"
+            },
+            "versions": "EQ(*)"
         },
         {
             "action": "get cookbook",
@@ -4523,11 +4523,6 @@
                     "order": 0
                 }
             },
-            "render": {
-                "type": "table",
-                "title": "Get Cookbook"
-            },
-            "versions": "EQ(*)",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -4627,7 +4622,12 @@
                         1
                     ]
                 }
-            ]
+            ],
+            "render": {
+                "type": "table",
+                "title": "Get Cookbook"
+            },
+            "versions": "EQ(*)"
         }
     ]
 }

@@ -54,7 +54,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: parsed response
         """
 
-        for key, value in response.items():
+        for key, value in list(response.items()):
             try:
                 if isinstance(value, (unicode, str)):
                     response[key] = value.strip(';')
@@ -98,7 +98,6 @@ class JoeSandboxV2Connector(BaseConnector):
             error_text = '\n'.join(split_lines)
         except:
             error_text = 'Cannot parse error details'
-
 
         if not error_text:
             error_text = "Error message unavailable. Please check the asset configuration and|or the action parameters."
@@ -635,7 +634,7 @@ class JoeSandboxV2Connector(BaseConnector):
         except Exception as e:
             try:
                 shutil.rmtree(temp_dir)
-            except Exception as e:
+            except Exception:
                 pass
             return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details from Phantom. Details: {0}'.format(str(e))), None)
 
@@ -648,7 +647,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
                 try:
                     shutil.rmtree(temp_dir)
-                except Exception as e:
+                except Exception:
                     pass
 
                 return phantom.APP_SUCCESS, vault_details
@@ -660,7 +659,7 @@ class JoeSandboxV2Connector(BaseConnector):
         if phantom.is_fail(return_val):
             try:
                 shutil.rmtree(temp_dir)
-            except Exception as e:
+            except Exception:
                 pass
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_ADDING_TO_VAULT_FAILED_MSG), None
 
@@ -926,7 +925,7 @@ class JoeSandboxV2Connector(BaseConnector):
         if response_data.get(JOE_JSON_RESPONSE):
             json_response_data = response_data[JOE_JSON_RESPONSE]
 
-            for key, subkey in overview_info_keys.items():
+            for key, subkey in list(overview_info_keys.items()):
                 # To check if each parent key's subkey that will be considered to display the widget, is a list. If
                 # not, then it will be converted into list
                 if json_response_data[JOE_JSON_ANALYSIS].get(key) and subkey:
@@ -953,7 +952,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
                     # Getting general information of module
                     system_behavior_module_data = {JOE_JSON_GENERAL: system_behavior_data.get(JOE_JSON_GENERAL)}
-                    for key, sub_key_list in system_behavior_info_keys.items():
+                    for key, sub_key_list in list(system_behavior_info_keys.items()):
                         for sub_key in sub_key_list:
                             if system_behavior_data.get(key, {}).get(sub_key, {}).get(JOE_JSON_CALL):
                                 # To check if each parent key's subkey that will be considered to display the widget
