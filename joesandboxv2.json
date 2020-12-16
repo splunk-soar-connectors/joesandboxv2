@@ -14,7 +14,7 @@
     "utctime_updated": "2020-12-10T04:12:22.000000Z",
     "package_name": "phantom_joesandboxv2",
     "main_module": "joesandboxv2_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "python_version": "3",
     "latest_tested_versions": [
@@ -62,7 +62,7 @@
             "action": "detonate file",
             "identifier": "detonate_file",
             "description": "Retrieve detonation analysis results for file",
-            "verbose": "If report_cache is enabled, action checks the cache for existing reports before running a full analysis and returns the latest analysis report from the cache. If disabled, it always spawns a new analysis.",
+            "verbose": "If report_cache is enabled, action checks the cache for existing reports before running a full analysis and returns the latest analysis report from the cache. If disabled, it always spawns a new analysis. If action is unable to find the file from vault using cookbook_vault_id, then action will submit analysis without cookbook parameter.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -2935,6 +2935,10 @@
                         false,
                         true
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.placeholder",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.report_cache",

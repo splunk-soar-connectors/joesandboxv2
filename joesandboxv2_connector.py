@@ -8,6 +8,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
+import phantom.rules as ph_rules
 
 
 import requests
@@ -362,14 +363,18 @@ class JoeSandboxV2Connector(BaseConnector):
         data_params.update({JOE_JSON_ANALYSIS_TIME: self._analysis_time})
 
         try:
-            files_array = (Vault.get_file_info(container_id=self.get_container_id()))
+            success, msg, files_array = ph_rules.vault_info(container_id=self.get_container_id())
+            if not success:
+                return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details. Error Details: {0}'.format(msg)), None)
+
+            files_array = list(files_array)
         except Exception as e:
             return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details. Error Details: {0}'.format(self._get_error_message_from_exception(e))), None)
 
         for file_data in files_array:
             if file_data[JOE_JSON_FILE_VAULT_ID] == file_vault_id:
                 # Getting filename to use if optional file name is not given
-                file_obj = open(Vault.get_file_path(file_vault_id), 'rb').read()
+                file_obj = open(file_data['path'], 'rb').read()
                 # Obtain file name
                 file_name = file_data[JOE_JSON_NAME]
                 file_params[JOE_JSON_SAMPLE] = (quote(self._handle_py_ver_compat_for_input_str(file_name)), file_obj)
@@ -377,7 +382,7 @@ class JoeSandboxV2Connector(BaseConnector):
             elif file_data[JOE_JSON_FILE_VAULT_ID] == cookbook_vault_id and \
                     detonate_file_type == JOE_JSON_COOKBOOK:
                 # Getting filename to use if optional file name is not given
-                cookbook_obj = open(Vault.get_file_path(cookbook_vault_id), 'rb').read()
+                cookbook_obj = open(file_data['path'], 'rb').read()
                 # Obtain cookbook name
                 cookbook_name = file_data[JOE_JSON_NAME]
                 file_params[JOE_JSON_COOKBOOK] = (quote(self._handle_py_ver_compat_for_input_str(cookbook_name)), cookbook_obj)
@@ -630,7 +635,10 @@ class JoeSandboxV2Connector(BaseConnector):
 
         try:
             # Check if report with same file name is already available in vault
-            vault_list = Vault.get_file_info(container_id=container_id)
+            _, _, vault_list = ph_rules.vault_info(container_id=container_id)
+            if vault_list is None:
+                vault_list = list()
+            vault_list = list(vault_list)
         except Exception as e:
             try:
                 shutil.rmtree(temp_dir)
@@ -685,19 +693,19 @@ class JoeSandboxV2Connector(BaseConnector):
         self.send_progress(phantom.APP_PROG_ADDING_TO_VAULT)
 
         # Adding report to vault
-        vault_ret_dict = Vault.add_attachment(local_file_path, container_id, filename)
+        success, msg, vault_id = ph_rules.vault_add(file_location=local_file_path, container=container_id, file_name=filename)
 
         # Updating report data with vault details
-        if vault_ret_dict['succeeded']:
+        if success:
             vault_details = {
-                phantom.APP_JSON_VAULT_ID: vault_ret_dict[phantom.APP_JSON_HASH],
+                phantom.APP_JSON_VAULT_ID: vault_id,
                 JOE_JSON_REPORT_FILE_NAME: filename
             }
             return phantom.APP_SUCCESS, vault_details
 
         # Error while adding report to vault
-        self.debug_print('Error adding file to vault:', vault_ret_dict)
-        action_result.append_to_message('. {}'.format(vault_ret_dict['message']))
+        self.debug_print('Error adding file to vault: success={}, message={}, vault_id={}'.format(success, msg, vault_id))
+        action_result.append_to_message('. {}'.format(msg))
 
         # Set the action_result status to error, the handler function will most probably return as is
         return phantom.APP_ERROR, None
