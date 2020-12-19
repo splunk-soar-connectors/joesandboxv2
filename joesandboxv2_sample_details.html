@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: joesandboxv2_sample_details.html
-  Copyright (c) 2019 Splunk Inc.
+  Copyright (c) 2019-2020 Splunk Inc.
 
   SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
   without a valid written license from Splunk Inc. is PROHIBITED.
@@ -263,11 +263,11 @@
                         <div class="panel">
                             <div class="panel-heading">
                               <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="general-information" href="#general-information-table-{{forloop.counter}}">General Information</a>
+                                <a data-toggle="collapse" href="#general-information-table-{{forloop.counter}}">General Information</a>
                               </h4>
                             </div>
 
-                            <div id="general-information-table-{{forloop.counter}}" class="panel-collapse collapse">
+                            <div id="general-information-table-{{forloop.counter}}" class="panel-collapse collapse" data-parent="#general-information-{{forloop.counter}}">
                                 <table class="wf-table-horizontal">
                                     {% if not result.data.sample_details.generalinfo %}
                                         <tbody>
@@ -357,11 +357,11 @@
                         <div class="panel">
                             <div class="panel-heading">
                               <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="detection" href="#detection-table-{{forloop.counter}}">Detection</a>
+                                <a data-toggle="collapse" href="#detection-table-{{forloop.counter}}">Detection</a>
                               </h4>
                             </div>
 
-                            <div id="detection-table-{{forloop.counter}}" class="panel-collapse collapse">
+                            <div id="detection-table-{{forloop.counter}}" class="panel-collapse collapse" data-parent="#detection-{{forloop.counter}}">
                                 <table class="wf-table-horizontal">
                                     {% if not result.data.sample_details.signaturedetections.strategy %}
                                         <tbody>
@@ -407,11 +407,11 @@
                         <div class="panel">
                             <div class="panel-heading">
                               <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="domains" href="#domains-table-{{forloop.counter}}">Contacted Domains</a>
+                                <a data-toggle="collapse" href="#domains-table-{{forloop.counter}}">Contacted Domains</a>
                               </h4>
                             </div>
 
-                            <div id="domains-table-{{forloop.counter}}" class="panel-collapse collapse">
+                            <div id="domains-table-{{forloop.counter}}" class="panel-collapse collapse" data-parent="#domains-{{forloop.counter}}">
                                 <table class="wf-table-horizontal">
                                     {% if not result.data.sample_details.domaininfo.domain %}
                                         <tbody>
@@ -455,11 +455,11 @@
                         <div class="panel">
                             <div class="panel-heading">
                               <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="ip" href="#ip-table-{{forloop.counter}}">Contacted IPs</a>
+                                <a data-toggle="collapse" href="#ip-table-{{forloop.counter}}">Contacted IPs</a>
                               </h4>
                             </div>
 
-                            <div id="ip-table-{{forloop.counter}}" class="panel-collapse collapse">
+                            <div id="ip-table-{{forloop.counter}}" class="panel-collapse collapse" data-parent="#ip-{{forloop.counter}}">
                                 <table class="wf-table-horizontal">
                                     {% if not result.data.sample_details.ipinfo.ip %}
                                         <tbody>
@@ -501,11 +501,11 @@
                         <div class="panel">
                             <div class="panel-heading">
                               <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="static-file-info" href="#static-file-info-data-{{forloop.counter}}">Static File Info</a>
+                                <a data-toggle="collapse" href="#static-file-info-data-{{forloop.counter}}">Static File Info</a>
                               </h4>
                             </div>
 
-                            <div id="static-file-info-data-{{forloop.counter}}" class="panel-collapse collapse">
+                            <div id="static-file-info-data-{{forloop.counter}}" class="panel-collapse collapse" data-parent="#static-file-info-{{forloop.counter}}">
                                 <table class="wf-table-horizontal" id="static-file-info-table">
                                     {% if not result.data.sample_details.fileinfo %}
                                         <tbody>
@@ -585,11 +585,11 @@
                         <div class="panel">
                             <div class="panel-heading">
                               <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="dropped-files" href="#dropped-files-data-{{forloop.counter}}">Created / Dropped Files</a>
+                                <a data-toggle="collapse" href="#dropped-files-data-{{forloop.counter}}">Created / Dropped Files</a>
                               </h4>
                             </div>
 
-                            <div id="dropped-files-data-{{forloop.counter}}" class="panel-collapse collapse">
+                            <div id="dropped-files-data-{{forloop.counter}}" class="panel-collapse collapse" data-parent="#dropped-files-{{forloop.counter}}">
                                 <table class="wf-table-horizontal" id="dropped-files-table">
                                     {% if not result.data.sample_details.droppedinfo.hash %}
                                         <tbody>
@@ -656,11 +656,11 @@
                         <div class="panel">
                             <div class="panel-heading">
                               <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="system-behavior" href="#system-behavior-data-{{forloop.counter}}">System Behavior</a>
+                                <a data-toggle="collapse" href="#system-behavior-data-{{forloop.counter}}">System Behavior</a>
                               </h4>
                             </div>
 
-                            <div id="system-behavior-data-{{forloop.counter}}" class="panel-collapse collapse nested-block-data">
+                            <div id="system-behavior-data-{{forloop.counter}}" class="panel-collapse collapse nested-block-data" data-parent="#system-behavior-{{forloop.counter}}">
                                 {% if not result.data.sample_details.system_behavior %}
                                     <table class="wf-table-horizontal" id="system-behavior-table">
                                         <tbody>
@@ -680,13 +680,13 @@
                                                   </h4>
                                                 </div>
 
-                                                <div id={{module_data.div_child_id}} class="panel-collapse collapse nested-block-data">
+                                                <div id={{module_data.div_child_id}} class="panel-collapse collapse show nested-block-data">
                                                     <!--Module general information section-->
                                                     <div class="panel-group module-general-info" id="general-info-section-{{forloop.counter0}}">
                                                         <div class="panel">
                                                             <div class="panel-heading">
                                                               <h4 class="panel-title">
-                                                                <a data-toggle="collapse" data-parent="general-info-section-{{forloop.counter0}}" href="#general-info-section-{{forloop.counter0}}-data">General</a>
+                                                                <a data-toggle="collapse" data-parent="#general-info-section-{{forloop.counter0}}" href="#general-info-section-{{forloop.counter0}}-data">General</a>
                                                               </h4>
                                                             </div>
 
@@ -754,21 +754,21 @@
                                                         <div class="panel">
                                                             <div class="panel-heading">
                                                               <h4 class="panel-title">
-                                                                <a data-toggle="collapse" data-parent="file-activities-section-{{forloop.counter0}}" href="#file-activities-section-{{forloop.counter0}}-data">File Activities</a>
+                                                                <a data-toggle="collapse" href="#file-activities-section-{{forloop.counter0}}-data">File Activities</a>
                                                               </h4>
                                                             </div>
 
-                                                            <div id="file-activities-section-{{forloop.counter0}}-data" class="panel-collapse collapse nested-block-data">
+                                                            <div id="file-activities-section-{{forloop.counter0}}-data" class="panel-collapse collapse nested-block-data" data-parent="#file-activities-section-{{forloop.counter0}}">
                                                                 <!--Files Deleted Section-->
                                                                 <div class="panel-group" id="file-deleted-section-{{forloop.counter0}}">
                                                                     <div class="panel">
                                                                         <div class="panel-heading">
                                                                           <h4 class="panel-title">
-                                                                            <a data-toggle="collapse" data-parent="file-deleted-section-{{forloop.counter0}}" href="#file-deleted-section-{{forloop.counter0}}-data">File Deleted</a>
+                                                                            <a data-toggle="collapse" href="#file-deleted-section-{{forloop.counter0}}-data">File Deleted</a>
                                                                           </h4>
                                                                         </div>
 
-                                                                        <div id="file-deleted-section-{{forloop.counter0}}-data" class="panel-collapse collapse">
+                                                                        <div id="file-deleted-section-{{forloop.counter0}}-data" class="panel-collapse collapse" data-parent="#file-deleted-section-{{forloop.counter0}}">
                                                                             {% if not "fileDeleted" in module_data.fileactivities %}
                                                                                 <table class="wf-table-horizontal">
                                                                                     <thead>
@@ -814,11 +814,11 @@
                                                                     <div class="panel">
                                                                         <div class="panel-heading">
                                                                           <h4 class="panel-title">
-                                                                            <a data-toggle="collapse" data-parent="file-moved-section-{{forloop.counter0}}" href="#file-moved-section-{{forloop.counter0}}-data">File Moved</a>
+                                                                            <a data-toggle="collapse" href="#file-moved-section-{{forloop.counter0}}-data">File Moved</a>
                                                                           </h4>
                                                                         </div>
 
-                                                                        <div id="file-moved-section-{{forloop.counter0}}-data" class="panel-collapse collapse">
+                                                                        <div id="file-moved-section-{{forloop.counter0}}-data" class="panel-collapse collapse" data-parent="#file-moved-section-{{forloop.counter0}}" >
                                                                             {% if not "fileMoved" in module_data.fileactivities %}
                                                                                 <table class="wf-table-horizontal">
                                                                                     <thead>
@@ -873,21 +873,21 @@
                                                         <div class="panel">
                                                             <div class="panel-heading">
                                                               <h4 class="panel-title">
-                                                                <a data-toggle="collapse" data-parent="registry-activities-section-{{forloop.counter0}}" href="#registry-activities-section-{{forloop.counter0}}-data">Registry Activities</a>
+                                                                <a data-toggle="collapse" href="#registry-activities-section-{{forloop.counter0}}-data">Registry Activities</a>
                                                               </h4>
                                                             </div>
 
-                                                            <div id="registry-activities-section-{{forloop.counter0}}-data" class="panel-collapse collapse nested-block-data">
+                                                            <div id="registry-activities-section-{{forloop.counter0}}-data" class="panel-collapse collapse nested-block-data" data-parent="#registry-activities-section-{{forloop.counter0}}" >
                                                                 <!--Keys Created Section-->
                                                                 <div class="panel-group" id="key-created-section-{{forloop.counter0}}">
                                                                     <div class="panel">
                                                                         <div class="panel-heading">
                                                                           <h4 class="panel-title">
-                                                                            <a data-toggle="collapse" data-parent="key-created-section-{{forloop.counter0}}" href="#key-created-section-{{forloop.counter0}}-data">Key Created</a>
+                                                                            <a data-toggle="collapse" href="#key-created-section-{{forloop.counter0}}-data">Key Created</a>
                                                                           </h4>
                                                                         </div>
 
-                                                                        <div id="key-created-section-{{forloop.counter0}}-data" class="panel-collapse collapse">
+                                                                        <div id="key-created-section-{{forloop.counter0}}-data" class="panel-collapse collapse" data-parent="#key-created-section-{{forloop.counter0}}" >
                                                                             {% if not "keyCreated" in module_data.registryactivities %}
                                                                                 <table class="wf-table-horizontal">
                                                                                     <thead>
@@ -929,11 +929,11 @@
                                                                     <div class="panel">
                                                                         <div class="panel-heading">
                                                                           <h4 class="panel-title">
-                                                                            <a data-toggle="collapse" data-parent="key-deleted-section-{{forloop.counter0}}" href="#key-deleted-section-{{forloop.counter0}}-data">Key Deleted</a>
+                                                                            <a data-toggle="collapse" href="#key-deleted-section-{{forloop.counter0}}-data">Key Deleted</a>
                                                                           </h4>
                                                                         </div>
 
-                                                                        <div id="key-deleted-section-{{forloop.counter0}}-data" class="panel-collapse collapse">
+                                                                        <div id="key-deleted-section-{{forloop.counter0}}-data" class="panel-collapse collapse" data-parent="#key-deleted-section-{{forloop.counter0}}" > 
                                                                             {% if not "keyDeleted" in module_data.registryactivities %}
                                                                                 <table class="wf-table-horizontal">
                                                                                     <thead>
@@ -975,11 +975,11 @@
                                                                     <div class="panel">
                                                                         <div class="panel-heading">
                                                                           <h4 class="panel-title">
-                                                                            <a data-toggle="collapse" data-parent="key-modified-section-{{forloop.counter0}}" href="#key-modified-section-{{forloop.counter0}}-data">Key Value Modified</a>
+                                                                            <a data-toggle="collapse" href="#key-modified-section-{{forloop.counter0}}-data">Key Value Modified</a>
                                                                           </h4>
                                                                         </div>
 
-                                                                        <div id="key-modified-section-{{forloop.counter0}}-data" class="panel-collapse collapse">
+                                                                        <div id="key-modified-section-{{forloop.counter0}}-data" class="panel-collapse collapse" data-parent="#key-modified-section-{{forloop.counter0}}" >
                                                                             {% if not "keyValueModified" in module_data.registryactivities %}
                                                                                 <table class="wf-table-horizontal">
                                                                                     <thead>

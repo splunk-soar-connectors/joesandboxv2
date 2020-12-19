@@ -1,5 +1,5 @@
 # File: joesandboxv2_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -8,6 +8,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
+import phantom.rules as ph_rules
 
 
 import requests
@@ -16,9 +17,13 @@ import math
 import time
 import shutil
 import os
+import sys
 import uuid
-import urllib
-from bs4 import BeautifulSoup
+try:
+    from urllib.parse import quote
+except ImportError:
+    from urllib import quote
+from bs4 import BeautifulSoup, UnicodeDammit
 from joesandboxv2_consts import *
 
 
@@ -50,9 +55,13 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: parsed response
         """
 
-        for key, value in response.iteritems():
-            if isinstance(value, (str, unicode)):
-                response[key] = value.strip(';')
+        for key, value in list(response.items()):
+            try:
+                if isinstance(value, (unicode, str)):
+                    response[key] = value.strip(';')
+            except NameError:
+                if isinstance(value, str):
+                    response[key] = value.strip(';')
 
         return response
 
@@ -68,8 +77,7 @@ class JoeSandboxV2Connector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, 'Empty response and no information in the header'),
                     None)
 
-    @staticmethod
-    def _process_html_response(response, action_result):
+    def _process_html_response(self, response, action_result):
         """ This function is used to process html response
 
         :param response: Response data
@@ -82,14 +90,20 @@ class JoeSandboxV2Connector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, 'html.parser')
-            error_text = soup.text.encode('utf-8')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+            error_text = self._handle_py_ver_compat_for_input_str(soup.text)
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
             error_text = 'Cannot parse error details'
 
-        message = JOE_ERR_INVALID_URL_MSG.format(status_code=status_code, error_msg=JOE_ERR_JSON_PARSE_MSG.format(raw_text=error_text.encode('utf-8')))
+        if not error_text:
+            error_text = "Error message unavailable. Please check the asset configuration and|or the action parameters."
+        message = JOE_ERR_INVALID_URL_MSG.format(status_code=status_code, error_msg=JOE_ERR_JSON_PARSE_MSG.format(raw_text=self._handle_py_ver_compat_for_input_str(error_text)))
+
         message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -103,13 +117,13 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: error_message
         """
 
+        error_message = ''
         if response.status_code not in (200, 399):
-            error_message = ''
             try:
                 err_resp_json = response.json()
             except Exception as e:
                 return RetVal(action_result.set_status(
-                    phantom.APP_ERROR, JOE_ERR_JSON_PARSE_MSG.format(raw_text=response.text),
+                    phantom.APP_ERROR, JOE_ERR_JSON_PARSE_MSG.format(raw_text=self._handle_py_ver_compat_for_input_str(response.text).replace('{', '{{').replace('}', '}}')),
                     e), None)
 
             error_list = err_resp_json.get(JOE_JSON_ERRORS, [])
@@ -141,8 +155,8 @@ class JoeSandboxV2Connector(BaseConnector):
         except Exception as e:
             return RetVal(action_result.set_status(
                 phantom.APP_ERROR,
-                JOE_ERR_JSON_PARSE_MSG.format(raw_text=response.text),
-                e), response_data)
+                JOE_ERR_JSON_PARSE_MSG.format(raw_text=self._handle_py_ver_compat_for_input_str(response.text).replace('{', '{{').replace('}', '}}')),
+                self._get_error_message_from_exception(e)), response_data)
 
         if response.status_code == JOE_JSON_RESP_SUCCESS_RESPONSE:
             if response_data.get(JOE_JSON_ANALYSIS):
@@ -156,8 +170,8 @@ class JoeSandboxV2Connector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_SUCCESS), {JOE_JSON_RESPONSE: response_data, JOE_JSON_RESPONSE_HEADERS: response.headers})
 
         # You should process the error returned in the json
-        message = u'Error from server. Status Code: {0}, Detail: {1} and Reason: {2}'.format(
-                response.status_code, JOE_ERR_UNKNOWN_ERROR_MSG, response.text.replace(u'{', u'{{').replace(u'}', u'}}'))
+        message = 'Error from server. Status Code: {0}, Detail: {1} and Reason: {2}'.format(
+                response.status_code, JOE_ERR_UNKNOWN_ERROR_MSG, self._handle_py_ver_compat_for_input_str(response.text).replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -194,10 +208,55 @@ class JoeSandboxV2Connector(BaseConnector):
             return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
-        message = u"Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
+                r.status_code, self._handle_py_ver_compat_for_input_str(response.text).replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if hasattr(e, 'args'):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+        except:
+            error_code = "Error code unavailable"
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the Joe Sandbox server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _make_rest_call(self, endpoint, action_result, data=None, files=None, method="post"):
         """ This function is used to make the REST call
@@ -230,7 +289,7 @@ class JoeSandboxV2Connector(BaseConnector):
             response = request_func('{}{}'.format(self._base_url, endpoint), data=data, files=files)
         except Exception as error:
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_SERVER_CONNECTION_MSG,
-                                            error.message), response_data
+                                            self._get_error_message_from_exception(error)), response_data
 
         return self._process_response(response, action_result)
 
@@ -286,8 +345,8 @@ class JoeSandboxV2Connector(BaseConnector):
         file_name = None
         cookbook_name = None
 
-        file_vault_id = param[JOE_JSON_FILE_VAULT_ID]
-        cookbook_vault_id = param.get(JOE_JSON_COOKBOOK_VAULT_ID)
+        file_vault_id = self._handle_py_ver_compat_for_input_str(param[JOE_JSON_FILE_VAULT_ID])
+        cookbook_vault_id = self._handle_py_ver_compat_for_input_str(param.get(JOE_JSON_COOKBOOK_VAULT_ID))
 
         # For custom analysis, type should be 'cookbook', else type should be 'file'
         if cookbook_vault_id:
@@ -296,33 +355,37 @@ class JoeSandboxV2Connector(BaseConnector):
             detonate_file_type = JOE_JSON_FILE
 
         if param.get(JOE_JSON_INET_ACCESS):
-                data_params[JOE_JSON_INTERNET_ACCESS] = 1
+            data_params[JOE_JSON_INTERNET_ACCESS] = 1
 
         if param.get(JOE_JSON_REPORT_CACHE):
-                data_params[JOE_JSON_ENABLE_CACHE] = 1
+            data_params[JOE_JSON_ENABLE_CACHE] = 1
 
         data_params.update({JOE_JSON_ANALYSIS_TIME: self._analysis_time})
 
         try:
-            files_array = (Vault.get_file_info(container_id=self.get_container_id()))
+            success, msg, files_array = ph_rules.vault_info(container_id=self.get_container_id())
+            if not success:
+                return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details. Error Details: {0}'.format(msg)), None)
+
+            files_array = list(files_array)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details from Phantom. Details: {0}'.format(str(e))), None)
+            return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details. Error Details: {0}'.format(self._get_error_message_from_exception(e))), None)
 
         for file_data in files_array:
             if file_data[JOE_JSON_FILE_VAULT_ID] == file_vault_id:
                 # Getting filename to use if optional file name is not given
-                file_obj = open(Vault.get_file_path(file_vault_id), 'rb').read()
+                file_obj = open(file_data['path'], 'rb').read()
                 # Obtain file name
                 file_name = file_data[JOE_JSON_NAME]
-                file_params[JOE_JSON_SAMPLE] = (urllib.quote(file_name.encode('utf-8')), file_obj)
+                file_params[JOE_JSON_SAMPLE] = (quote(self._handle_py_ver_compat_for_input_str(file_name)), file_obj)
 
             elif file_data[JOE_JSON_FILE_VAULT_ID] == cookbook_vault_id and \
                     detonate_file_type == JOE_JSON_COOKBOOK:
                 # Getting filename to use if optional file name is not given
-                cookbook_obj = open(Vault.get_file_path(cookbook_vault_id), 'rb').read()
+                cookbook_obj = open(file_data['path'], 'rb').read()
                 # Obtain cookbook name
                 cookbook_name = file_data[JOE_JSON_NAME]
-                file_params[JOE_JSON_COOKBOOK] = (urllib.quote(cookbook_name.encode('utf-8')), cookbook_obj)
+                file_params[JOE_JSON_COOKBOOK] = (quote(self._handle_py_ver_compat_for_input_str(cookbook_name)), cookbook_obj)
 
             # If type = 'file', 'sample' key must be there in file_params dict
             # If type = 'cookbook', 'sample' and 'cookbook' keys must be there in file_params dict
@@ -397,7 +460,7 @@ class JoeSandboxV2Connector(BaseConnector):
         summary_data = action_result.update_summary({})
 
         # getting mandatory parameter
-        webid = param[JOE_JSON_ID]
+        webid = self._handle_py_ver_compat_for_input_str(param[JOE_JSON_ID])
 
         data = {JOE_JSON_WEBID: webid, JOE_JSON_TYPE: 'pcap'}
 
@@ -421,8 +484,8 @@ class JoeSandboxV2Connector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary_data = action_result.update_summary({})
 
-        webid = param[JOE_JSON_ID]
-        report_type = param[JOE_JSON_TYPE]
+        webid = self._handle_py_ver_compat_for_input_str(param[JOE_JSON_ID])
+        report_type = self._handle_py_ver_compat_for_input_str(param[JOE_JSON_TYPE])
 
         api_params = {
             JOE_JSON_WEBID: webid,
@@ -471,8 +534,8 @@ class JoeSandboxV2Connector(BaseConnector):
         try:
             response_json = json.loads(response_data[JOE_JSON_RESPONSE]).get('data', {})
         except Exception as e:
-            self.debug_print(JOE_ERR_JSON_MSG.format(error=e.message))
-            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=e.message)), None
+            self.debug_print(JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e))), None
 
         # Report of the sample will be downloaded only if analysis of sample is finished
         if response_json.get(JOE_JSON_STATUS) != JOE_JSON_FINISHED:
@@ -532,6 +595,11 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        if isinstance(content, bytes):
+            open_mode = 'wb'
+        else:
+            open_mode = 'w'
+
         # Creating temporary directory and file
         try:
             if hasattr(Vault, 'get_vault_tmp_dir'):
@@ -541,19 +609,40 @@ class JoeSandboxV2Connector(BaseConnector):
             temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
             os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, filename)
-            with open(file_path, 'wb') as file_obj:
+            with open(file_path, open_mode) as file_obj:
                 file_obj.write(content)
+        except IOError as e:
+            error_msg = self._get_error_message_from_exception(e)
+            try:
+                # Handling "Filename too long"/"File name too long"
+                if "too long" in error_msg:
+                    random_suffix = uuid.uuid4()
+                    new_file_name = "long_filename_{}".format(self._handle_py_ver_compat_for_input_str(random_suffix))
+                    file_path = os.path.join(temp_dir, new_file_name)
+                    self.debug_print("Original filename: {}".format(self._handle_py_ver_compat_for_input_str(filename)))
+                    self.debug_print("Modified filename: {}".format(new_file_name))
+                    with open(file_path, open_mode) as _temp_file:
+                        _temp_file.write(content)
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error Details:{}".format(
+                        self._get_error_message_from_exception(e))), None
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error Details:{}".format(
+                    self._get_error_message_from_exception(e))), None
         except Exception as e:
             self.debug_print(JOE_ERR_FILE_MSG)
-            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_FILE_MSG, e), None
+            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_FILE_MSG, self._get_error_message_from_exception(e)), None
 
         try:
             # Check if report with same file name is already available in vault
-            vault_list = Vault.get_file_info(container_id=container_id)
+            _, _, vault_list = ph_rules.vault_info(container_id=container_id)
+            if vault_list is None:
+                vault_list = list()
+            vault_list = list(vault_list)
         except Exception as e:
             try:
                 shutil.rmtree(temp_dir)
-            except Exception as e:
+            except Exception:
                 pass
             return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details from Phantom. Details: {0}'.format(str(e))), None)
 
@@ -566,7 +655,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
                 try:
                     shutil.rmtree(temp_dir)
-                except Exception as e:
+                except Exception:
                     pass
 
                 return phantom.APP_SUCCESS, vault_details
@@ -578,7 +667,7 @@ class JoeSandboxV2Connector(BaseConnector):
         if phantom.is_fail(return_val):
             try:
                 shutil.rmtree(temp_dir)
-            except Exception as e:
+            except Exception:
                 pass
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_ADDING_TO_VAULT_FAILED_MSG), None
 
@@ -604,19 +693,19 @@ class JoeSandboxV2Connector(BaseConnector):
         self.send_progress(phantom.APP_PROG_ADDING_TO_VAULT)
 
         # Adding report to vault
-        vault_ret_dict = Vault.add_attachment(local_file_path, container_id, filename)
+        success, msg, vault_id = ph_rules.vault_add(file_location=local_file_path, container=container_id, file_name=filename)
 
         # Updating report data with vault details
-        if vault_ret_dict['succeeded']:
+        if success:
             vault_details = {
-                phantom.APP_JSON_VAULT_ID: vault_ret_dict[phantom.APP_JSON_HASH],
+                phantom.APP_JSON_VAULT_ID: vault_id,
                 JOE_JSON_REPORT_FILE_NAME: filename
             }
             return phantom.APP_SUCCESS, vault_details
 
         # Error while adding report to vault
-        self.debug_print('Error adding file to vault:', vault_ret_dict)
-        action_result.append_to_message('. {}'.format(vault_ret_dict['message']))
+        self.debug_print('Error adding file to vault: success={}, message={}, vault_id={}'.format(success, msg, vault_id))
+        action_result.append_to_message('. {}'.format(msg))
 
         # Set the action_result status to error, the handler function will most probably return as is
         return phantom.APP_ERROR, None
@@ -632,7 +721,7 @@ class JoeSandboxV2Connector(BaseConnector):
         summary_data = action_result.update_summary({})
 
         # getting mandatory parameters
-        webid = param[JOE_JSON_ID]
+        webid = self._handle_py_ver_compat_for_input_str(param[JOE_JSON_ID])
 
         # getting status of webid
         response_status, response_data = self._make_rest_call(JOE_CHECK_STATUS_ENDPOINT, action_result,
@@ -691,13 +780,13 @@ class JoeSandboxV2Connector(BaseConnector):
         file_params = {}
         data_params = {}
 
-        sample = param[JOE_CONFIG_SERVER]
+        sample = self._handle_py_ver_compat_for_input_str(param[JOE_CONFIG_SERVER])
 
         if param.get(JOE_JSON_INET_ACCESS):
             data_params[JOE_JSON_INTERNET_ACCESS] = 1
 
         if param.get(JOE_JSON_REPORT_CACHE):
-                data_params[JOE_JSON_ENABLE_CACHE] = 1
+            data_params[JOE_JSON_ENABLE_CACHE] = 1
 
         data_params.update({JOE_CONFIG_SERVER: sample, JOE_JSON_ANALYSIS_TIME: self._analysis_time})
 
@@ -821,12 +910,12 @@ class JoeSandboxV2Connector(BaseConnector):
             return action_result.get_status(), None
 
         if JOE_JSON_RESPONSE in response_data:
-            if isinstance(response_data[JOE_JSON_RESPONSE], basestring):
+            if isinstance(response_data[JOE_JSON_RESPONSE], (str, bytes)):
                 try:
                     response_data[JOE_JSON_RESPONSE] = json.loads(response_data[JOE_JSON_RESPONSE])
                 except Exception as e:
-                    self.debug_print(JOE_ERR_JSON_MSG.format(error=e.message))
-                    return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=e.message)),\
+                    self.debug_print(JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e)))
+                    return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e))),\
                            None
 
         # Required fields to be extracted from the response obtained
@@ -844,7 +933,7 @@ class JoeSandboxV2Connector(BaseConnector):
         if response_data.get(JOE_JSON_RESPONSE):
             json_response_data = response_data[JOE_JSON_RESPONSE]
 
-            for key, subkey in overview_info_keys.iteritems():
+            for key, subkey in list(overview_info_keys.items()):
                 # To check if each parent key's subkey that will be considered to display the widget, is a list. If
                 # not, then it will be converted into list
                 if json_response_data[JOE_JSON_ANALYSIS].get(key) and subkey:
@@ -871,7 +960,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
                     # Getting general information of module
                     system_behavior_module_data = {JOE_JSON_GENERAL: system_behavior_data.get(JOE_JSON_GENERAL)}
-                    for key, sub_key_list in system_behavior_info_keys.iteritems():
+                    for key, sub_key_list in list(system_behavior_info_keys.items()):
                         for sub_key in sub_key_list:
                             if system_behavior_data.get(key, {}).get(sub_key, {}).get(JOE_JSON_CALL):
                                 # To check if each parent key's subkey that will be considered to display the widget
@@ -880,7 +969,7 @@ class JoeSandboxV2Connector(BaseConnector):
                                     system_behavior_data[key][sub_key][JOE_JSON_CALL] = [
                                         system_behavior_data[key][sub_key][JOE_JSON_CALL]
                                     ]
-                                if key not in system_behavior_module_data.keys():
+                                if key not in list(system_behavior_module_data.keys()):
                                     system_behavior_module_data[key] = dict()
 
                                 system_behavior_module_data[key][sub_key] = system_behavior_data[key][sub_key][
@@ -902,7 +991,7 @@ class JoeSandboxV2Connector(BaseConnector):
         summary_data = action_result.update_summary({})
 
         # getting mandatory parameter
-        url = param[JOE_JSON_URL]
+        url = self._handle_py_ver_compat_for_input_str(param[JOE_JSON_URL])
 
         api_params = {JOE_JSON_Q: url}
 
@@ -1049,7 +1138,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cookbook_id = param[JOE_JSON_ID]
+        cookbook_id = self._handle_py_ver_compat_for_input_str(param[JOE_JSON_ID])
 
         json_data = {
             JOE_JSON_ID: cookbook_id
@@ -1105,7 +1194,7 @@ class JoeSandboxV2Connector(BaseConnector):
         action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
 
-        if action in action_mapping.keys():
+        if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
             action_execution_status = action_function(param)
 
@@ -1118,6 +1207,10 @@ class JoeSandboxV2Connector(BaseConnector):
         phantom.APP_ERROR. If this function returns phantom.APP_ERROR, then AppConnector::handle_action will not get
         called.
         """
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the major version of Python.")
 
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
@@ -1127,7 +1220,7 @@ class JoeSandboxV2Connector(BaseConnector):
         config = self.get_config()
 
         # Initialize configuration parameters
-        self._base_url = config[JOE_CONFIG_SERVER].strip('/')
+        self._base_url = self._handle_py_ver_compat_for_input_str(config[JOE_CONFIG_SERVER]).strip('/')
         self._api_key = config[JOE_CONFIG_API_KEY]
 
         self._detonate_timeout = str(config.get(JOE_CONFIG_TIMEOUT,
@@ -1184,7 +1277,7 @@ if __name__ == '__main__':
 
     if username and password:
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get("https://127.0.0.1/login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1197,11 +1290,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken={0}'.format(csrftoken)
             headers['Referer'] = 'https://127.0.0.1/login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {0}".format(str(e)))
+            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1217,6 +1310,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
