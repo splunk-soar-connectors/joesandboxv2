@@ -2831,7 +2831,7 @@
                         "url"
                     ],
                     "column_name": "URL",
-                    "column_order": 5,
+                    "column_order": 0,
                     "example_values": [
                         "http://test.co"
                     ]
