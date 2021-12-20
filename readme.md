@@ -13,8 +13,8 @@
 [comment]: # "and limitations under the License."
 [comment]: # ""
 The report_cache parameter behaves differently for the detonate file and detonate url actions. These
-differences are outlined below.  
-  
+differences are outlined below.
+
 **Detonate File**
 
 -   If caching is enabled and cookbook is provided then the caching is ignored and a new detonation
