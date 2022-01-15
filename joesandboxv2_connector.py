@@ -1,29 +1,39 @@
 # File: joesandboxv2_connector.py
-# Copyright (c) 2019-2020 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
-
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-from phantom.vault import Vault
-import phantom.rules as ph_rules
-
-
-import requests
+# Copyright (c) 2019-2022 Splunk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
 import json
 import math
-import time
-import shutil
 import os
+import shutil
 import sys
+import time
 import uuid
+
+import phantom.app as phantom
+import phantom.rules as ph_rules
+import requests
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+from phantom.vault import Vault
+
 try:
     from urllib.parse import quote
 except ImportError:
     from urllib import quote
+
 from bs4 import BeautifulSoup, UnicodeDammit
+
 from joesandboxv2_consts import *
 
 
@@ -102,7 +112,8 @@ class JoeSandboxV2Connector(BaseConnector):
 
         if not error_text:
             error_text = "Error message unavailable. Please check the asset configuration and|or the action parameters."
-        message = JOE_ERR_INVALID_URL_MSG.format(status_code=status_code, error_msg=JOE_ERR_JSON_PARSE_MSG.format(raw_text=self._handle_py_ver_compat_for_input_str(error_text)))
+        message = JOE_ERR_INVALID_URL_MSG.format(status_code=status_code, error_msg=JOE_ERR_JSON_PARSE_MSG.format(
+            raw_text=self._handle_py_ver_compat_for_input_str(error_text)))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -123,8 +134,8 @@ class JoeSandboxV2Connector(BaseConnector):
                 err_resp_json = response.json()
             except Exception as e:
                 return RetVal(action_result.set_status(
-                    phantom.APP_ERROR, JOE_ERR_JSON_PARSE_MSG.format(raw_text=self._handle_py_ver_compat_for_input_str(response.text).replace('{', '{{').replace('}', '}}')),
-                    e), None)
+                    phantom.APP_ERROR, JOE_ERR_JSON_PARSE_MSG.format(
+                        raw_text=self._handle_py_ver_compat_for_input_str(response.text).replace('{', '{{').replace('}', '}}')), e), None)
 
             error_list = err_resp_json.get(JOE_JSON_ERRORS, [])
 
@@ -155,8 +166,8 @@ class JoeSandboxV2Connector(BaseConnector):
         except Exception as e:
             return RetVal(action_result.set_status(
                 phantom.APP_ERROR,
-                JOE_ERR_JSON_PARSE_MSG.format(raw_text=self._handle_py_ver_compat_for_input_str(response.text).replace('{', '{{').replace('}', '}}')),
-                self._get_error_message_from_exception(e)), response_data)
+                JOE_ERR_JSON_PARSE_MSG.format(raw_text=self._handle_py_ver_compat_for_input_str(response.text)
+                .replace('{', '{{').replace('}', '}}')), self._get_error_message_from_exception(e)), response_data)
 
         if response.status_code == JOE_JSON_RESP_SUCCESS_RESPONSE:
             if response_data.get(JOE_JSON_ANALYSIS):
@@ -167,11 +178,13 @@ class JoeSandboxV2Connector(BaseConnector):
                 return RetVal(action_result.set_status(phantom.APP_SUCCESS), {JOE_JSON_RESPONSE: response_data.get(JOE_JSON_DATA, {}),
                                          JOE_JSON_RESPONSE_HEADERS: response.headers})
         elif response.status_code in (201, 399):
-            return RetVal(action_result.set_status(phantom.APP_SUCCESS), {JOE_JSON_RESPONSE: response_data, JOE_JSON_RESPONSE_HEADERS: response.headers})
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS), {JOE_JSON_RESPONSE: response_data,
+                                         JOE_JSON_RESPONSE_HEADERS: response.headers})
 
         # You should process the error returned in the json
         message = 'Error from server. Status Code: {0}, Detail: {1} and Reason: {2}'.format(
-                response.status_code, JOE_ERR_UNKNOWN_ERROR_MSG, self._handle_py_ver_compat_for_input_str(response.text).replace('{', '{{').replace('}', '}}'))
+                response.status_code, JOE_ERR_UNKNOWN_ERROR_MSG, self._handle_py_ver_compat_for_input_str(response.text)
+                        .replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -252,7 +265,8 @@ class JoeSandboxV2Connector(BaseConnector):
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Joe Sandbox server. Please check the asset configuration and|or the action parameters."
+            error_msg = "Error occurred while connecting to the Joe Sandbox server. "
+            error_msg += "Please check the asset configuration and|or the action parameters."
         except:
             error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
@@ -369,7 +383,8 @@ class JoeSandboxV2Connector(BaseConnector):
 
             files_array = list(files_array)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details. Error Details: {0}'.format(self._get_error_message_from_exception(e))), None)
+            return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details. Error Details: {0}'.format(
+                self._get_error_message_from_exception(e))), None)
 
         for file_data in files_array:
             if file_data[JOE_JSON_FILE_VAULT_ID] == file_vault_id:
@@ -644,7 +659,8 @@ class JoeSandboxV2Connector(BaseConnector):
                 shutil.rmtree(temp_dir)
             except Exception:
                 pass
-            return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details from Phantom. Details: {0}'.format(str(e))), None)
+            return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details from Phantom. Details: {0}'.format(
+                str(e))), None)
 
         # Iterate through each vault item in the container and compare name and size of file
         for vault in vault_list:
@@ -915,8 +931,8 @@ class JoeSandboxV2Connector(BaseConnector):
                     response_data[JOE_JSON_RESPONSE] = json.loads(response_data[JOE_JSON_RESPONSE])
                 except Exception as e:
                     self.debug_print(JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e)))
-                    return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e))),\
-                           None
+                    return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(
+                        error=self._get_error_message_from_exception(e))), None
 
         # Required fields to be extracted from the response obtained
         overview_info_keys = {
@@ -950,10 +966,12 @@ class JoeSandboxV2Connector(BaseConnector):
             json_response_filter_data[JOE_JSON_SYSTEM_BEHAVIOR] = []
 
             # If path to get system behavior data is available, then converting it into list if it is an object
-            behavior_data = json_response_data.get(JOE_JSON_ANALYSIS, {}).get(JOE_JSON_BEHAVIOR, {}).get(JOE_JSON_SYSTEM, {}).get(JOE_JSON_PROCESSES, {}).get(JOE_JSON_PROCESS, [])
+            behavior_data = json_response_data.get(JOE_JSON_ANALYSIS, {}).get(JOE_JSON_BEHAVIOR, {}).get(JOE_JSON_SYSTEM, {}) \
+                .get(JOE_JSON_PROCESSES, {}).get(JOE_JSON_PROCESS, [])
             if behavior_data:
                 if isinstance(behavior_data, dict):
-                    json_response_data[JOE_JSON_ANALYSIS][JOE_JSON_BEHAVIOR][JOE_JSON_SYSTEM][JOE_JSON_PROCESSES][JOE_JSON_PROCESS] = [behavior_data]
+                    json_response_data[JOE_JSON_ANALYSIS][JOE_JSON_BEHAVIOR][JOE_JSON_SYSTEM][JOE_JSON_PROCESSES][JOE_JSON_PROCESS] = \
+                         [behavior_data]
 
                 # Iterating over system behavior keys to get data related to file activities and registry activities
                 for system_behavior_data in behavior_data:
@@ -1163,7 +1181,8 @@ class JoeSandboxV2Connector(BaseConnector):
         if phantom.is_fail(response_status):
             return action_result.get_status()
 
-        response_data.update({JOE_JSON_FILE_NAME: vault_details.get(JOE_JSON_REPORT_FILE_NAME), JOE_JSON_COOKBOOK_VAULT_ID: vault_details.get(JOE_JSON_VAULT_ID)})
+        response_data.update({JOE_JSON_FILE_NAME: vault_details.get(JOE_JSON_REPORT_FILE_NAME),
+            JOE_JSON_COOKBOOK_VAULT_ID: vault_details.get(JOE_JSON_VAULT_ID)})
         action_result.add_data(response_data)
 
         return action_result.set_status(phantom.APP_SUCCESS, 'The cookbook is successfully fetched and added to the vault')
@@ -1252,8 +1271,9 @@ class JoeSandboxV2Connector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import pudb
     import argparse
+
+    import pudb
 
     pudb.set_trace()
 
