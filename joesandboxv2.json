@@ -29,23 +29,30 @@
             "default": "https://jbxcloud.joesecurity.org",
             "order": 0
         },
+        "verify_ssl": {
+            "description": "Verify Joe Sandbox Certificate",
+            "data_type": "boolean",
+            "required": true,
+            "default": true,
+            "order": 1
+        },
         "api_key": {
             "description": "API Key",
             "data_type": "password",
             "required": true,
-            "order": 1
+            "order": 2
         },
         "timeout": {
             "description": "Detonation timeout (30-300 seconds)",
             "data_type": "numeric",
             "default": 120,
-            "order": 2
+            "order": 3
         },
         "analysis_time": {
             "description": "Maximum time to complete detonation analysis (30-300 seconds)",
             "data_type": "numeric",
             "default": 120,
-            "order": 3
+            "order": 4
         }
     },
     "actions": [

@@ -300,7 +300,7 @@ class JoeSandboxV2Connector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, e), response_data
 
         try:
-            response = request_func('{}{}'.format(self._base_url, endpoint), data=data, files=files)
+            response = request_func('{}{}'.format(self._base_url, endpoint), data=data, files=files, verify=self._verify_ssl)
         except Exception as error:
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_SERVER_CONNECTION_MSG,
                                             self._get_error_message_from_exception(error)), response_data
@@ -1241,6 +1241,7 @@ class JoeSandboxV2Connector(BaseConnector):
         # Initialize configuration parameters
         self._base_url = self._handle_py_ver_compat_for_input_str(config[JOE_CONFIG_SERVER]).strip('/')
         self._api_key = config[JOE_CONFIG_API_KEY]
+        self._verify_ssl = config[JOE_CONFIG_VERIFY_SSL]
 
         self._detonate_timeout = str(config.get(JOE_CONFIG_TIMEOUT,
                                                 JOE_TIME_DEFAULT))
