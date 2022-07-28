@@ -15,6 +15,7 @@
 JOE_CONFIG_SERVER = 'url'
 JOE_CONFIG_API_KEY = 'api_key'
 JOE_CONFIG_TIMEOUT = 'timeout'
+JOE_CONFIG_VERIFY_SSL = 'verify_ssl'
 JOE_CONFIG_ANALYSIS_TIME = 'analysis_time'
 JOE_ACTION_GET_REPORT = 'get_report'
 JOE_ACTION_GET_PCAP = 'get_pcap'
