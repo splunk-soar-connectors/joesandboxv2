@@ -1142,6 +1142,8 @@ class JoeSandboxV2Connector(BaseConnector):
         if response_data:
             for data in response_data:
                 action_result.add_data(data)
+        else:
+            self.debug_print(f"Could not find {JOE_JSON_RESPONSE} in response data")
 
         summary_data.update({'total_cookbooks': action_result.get_data_size()})
 
