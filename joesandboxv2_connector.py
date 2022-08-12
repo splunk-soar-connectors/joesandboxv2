@@ -1124,6 +1124,7 @@ class JoeSandboxV2Connector(BaseConnector):
         response_status, response_data = self._make_rest_call(JOE_LIST_COOKBOOKS_ENDPOINT, action_result)
 
         if phantom.is_fail(response_status):
+            self.save_progress(f"Error while fetching the cookbooks: {action_result.get_message()}")
             return action_result.get_status()
 
         response_data = response_data.get(JOE_JSON_RESPONSE)
