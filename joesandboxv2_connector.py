@@ -322,6 +322,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary_data = action_result.update_summary({})
 
@@ -448,6 +449,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary_data = action_result.update_summary({})
 
@@ -473,6 +475,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :param param: Dictionary of input parameters containing webid of sample and type of report
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary_data = action_result.update_summary({})
 
@@ -710,6 +713,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary_data = action_result.update_summary({})
 
@@ -725,6 +729,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
         # Adding a new key in the data which contains the reputation of the file or URL, defined based on 'runs --> detection'
         # parameter available in data
+        self.debug_print("Processing the response")
         reputation_detection_list = response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_RUNS, [])
 
         if reputation_detection_list and len(reputation_detection_list) > 0:
@@ -761,6 +766,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary_data = action_result.update_summary({})
 
@@ -783,6 +789,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
         data_params.update({JOE_CONFIG_SERVER: sample, JOE_JSON_ANALYSIS_TIME: self._analysis_time})
 
+        self.debug_print(f"Detonation parameters: {data_params}")
         response_status, response_data = self._submit_sample(file_params, data_params, action_result)
 
         if phantom.is_fail(response_status):
@@ -982,6 +989,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary_data = action_result.update_summary({})
 
@@ -1012,6 +1020,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
         # Adding a new key in the data which contains the reputation of the file or URL, defined based on 'runs --> detection'
         # parameter available in data
+        self.debug_print("Processing the response")
         reputation_detection_list = response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_RUNS, [])
 
         if reputation_detection_list and len(reputation_detection_list) > 0:
@@ -1049,6 +1058,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary_data = action_result.update_summary({})
 
@@ -1079,6 +1089,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
         # Adding a new key in the data which contains the reputation of the file or URL, defined based on 'runs --> detection'
         # parameter available in data
+        self.debug_print("Processing the response")
         reputation_detection_list = response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_RUNS, [])
 
         if reputation_detection_list and len(reputation_detection_list) > 0:
@@ -1106,6 +1117,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary_data = action_result.update_summary({})
 
@@ -1114,7 +1126,7 @@ class JoeSandboxV2Connector(BaseConnector):
         if phantom.is_fail(response_status):
             return action_result.get_status()
 
-        response_data = response_data.get(JOE_JSON_RESPONSE, {})
+        response_data = response_data.get(JOE_JSON_RESPONSE)
 
         if response_data:
             for data in response_data:
@@ -1133,6 +1145,7 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         cookbook_id = param[JOE_JSON_ID]
