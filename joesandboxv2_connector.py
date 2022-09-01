@@ -76,6 +76,9 @@ class JoeSandboxV2Connector(BaseConnector):
 
         return response
 
+    def _dump_error_log(self, error):
+        self.error_print("Exception occurred.", dump_object=error)
+
     @staticmethod
     def _process_empty_response(response, action_result):
         """ This function is used to process empty response
@@ -163,6 +166,7 @@ class JoeSandboxV2Connector(BaseConnector):
         try:
             response_data = response.json()
         except Exception as e:
+            self._dump_error_log(e)
             error_msg = JOE_ERR_JSON_PARSE_MSG.format(raw_text=response.text.replace('{', '{{').replace('}', '}}'))
             error_msg = "{}. {}".format(error_msg, self._get_error_message_from_exception(e))
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_msg), response_data)
@@ -240,7 +244,7 @@ class JoeSandboxV2Connector(BaseConnector):
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
         except Exception as e:
-            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
+            self._dump_error_log(e)
 
         if not error_code:
             error_text = "Error Message: {}".format(error_msg)
@@ -271,14 +275,17 @@ class JoeSandboxV2Connector(BaseConnector):
         # All API calls supports POST request
         try:
             request_func = getattr(requests, method)
-        except AttributeError:
+        except AttributeError as e:
+            self._dump_error_log(e)
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_API_UNSUPPORTED_METHOD_MSG), response_data
         except Exception as e:
+            self._dump_error_log(e)
             return action_result.set_status(phantom.APP_ERROR, e), response_data
 
         try:
             response = request_func('{}{}'.format(self._base_url, endpoint), data=data, files=files, verify=self._verify_ssl)
         except Exception as error:
+            self._dump_error_log(error)
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_SERVER_CONNECTION_MSG,
                                             self._get_error_message_from_exception(error)), response_data
 
@@ -361,6 +368,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
             files_array = list(files_array)
         except Exception as e:
+            self._dump_error_log(e)
             return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details. Error details: {0}'.format(
                 self._get_error_message_from_exception(e))), None)
 
@@ -529,6 +537,7 @@ class JoeSandboxV2Connector(BaseConnector):
         try:
             response_json = json.loads(response_data[JOE_JSON_RESPONSE]).get('data', {})
         except Exception as e:
+            self._dump_error_log(e)
             self.debug_print(JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e)))
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e))), None
 
@@ -622,9 +631,11 @@ class JoeSandboxV2Connector(BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error details: {}".format(
                         self._get_error_message_from_exception(e))), None
             except Exception as e:
+                self._dump_error_log(e)
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error details: {}".format(
                     self._get_error_message_from_exception(e))), None
         except Exception as e:
+            self._dump_error_log(e)
             self.debug_print(JOE_ERR_FILE_MSG)
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_FILE_MSG, self._get_error_message_from_exception(e)), None
 
@@ -635,6 +646,7 @@ class JoeSandboxV2Connector(BaseConnector):
                 vault_list = list()
             vault_list = list(vault_list)
         except Exception as e:
+            self._dump_error_log(e)
             try:
                 shutil.rmtree(temp_dir)
             except Exception:
@@ -671,6 +683,7 @@ class JoeSandboxV2Connector(BaseConnector):
         try:
             shutil.rmtree(temp_dir)
         except Exception as e:
+            self._dump_error_log(e)
             self.debug_print(JOE_ERR_REMOVE_DIRECTORY_MSG)
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_REMOVE_DIRECTORY_MSG, e), None
 
@@ -914,6 +927,7 @@ class JoeSandboxV2Connector(BaseConnector):
                 try:
                     response_data[JOE_JSON_RESPONSE] = json.loads(response_data[JOE_JSON_RESPONSE])
                 except Exception as e:
+                    self._dump_error_log(e)
                     self.debug_print(JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e)))
                     return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(
                         error=self._get_error_message_from_exception(e))), None
