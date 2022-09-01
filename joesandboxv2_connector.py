@@ -76,8 +76,8 @@ class JoeSandboxV2Connector(BaseConnector):
 
         return response
 
-    def _dump_error_log(self, error):
-        self.error_print("Exception occurred.", dump_object=error)
+    def _dump_error_log(self, error, message="Exception occurred."):
+        self.error_print(message, dump_object=error)
 
     @staticmethod
     def _process_empty_response(response, action_result):
@@ -244,7 +244,7 @@ class JoeSandboxV2Connector(BaseConnector):
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
         except Exception as e:
-            self._dump_error_log(e)
+            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         if not error_code:
             error_text = "Error Message: {}".format(error_msg)
@@ -538,7 +538,6 @@ class JoeSandboxV2Connector(BaseConnector):
             response_json = json.loads(response_data[JOE_JSON_RESPONSE]).get('data', {})
         except Exception as e:
             self._dump_error_log(e)
-            self.debug_print(JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e)))
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e))), None
 
         # Report of the sample will be downloaded only if analysis of sample is finished
@@ -635,8 +634,7 @@ class JoeSandboxV2Connector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error details: {}".format(
                     self._get_error_message_from_exception(e))), None
         except Exception as e:
-            self._dump_error_log(e)
-            self.debug_print(JOE_ERR_FILE_MSG)
+            self._dump_error_log(e, JOE_ERR_FILE_MSG)
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_FILE_MSG, self._get_error_message_from_exception(e)), None
 
         try:
@@ -683,8 +681,7 @@ class JoeSandboxV2Connector(BaseConnector):
         try:
             shutil.rmtree(temp_dir)
         except Exception as e:
-            self._dump_error_log(e)
-            self.debug_print(JOE_ERR_REMOVE_DIRECTORY_MSG)
+            self._dump_error_log(e, JOE_ERR_REMOVE_DIRECTORY_MSG)
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_REMOVE_DIRECTORY_MSG, e), None
 
         return action_result.set_status(phantom.APP_SUCCESS), vault_details
@@ -928,7 +925,6 @@ class JoeSandboxV2Connector(BaseConnector):
                     response_data[JOE_JSON_RESPONSE] = json.loads(response_data[JOE_JSON_RESPONSE])
                 except Exception as e:
                     self._dump_error_log(e)
-                    self.debug_print(JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e)))
                     return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(
                         error=self._get_error_message_from_exception(e))), None
 
