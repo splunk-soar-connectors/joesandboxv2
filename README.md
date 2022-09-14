@@ -2,11 +2,11 @@
 # Joe Sandbox v2
 
 Publisher: Splunk  
-Connector Version: 2\.0\.28  
+Connector Version: 2\.1\.0  
 Product Vendor: Joe Security LLC  
 Product Name: Joe Sandbox v2  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.9\.39220  
+Minimum Product Version: 5\.3\.0  
 
 This app supports executing investigative actions to analyze files and URLs on Joe Sandbox
 
@@ -48,6 +48,7 @@ The below configuration variables are required for this Connector to operate.  T
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **url** |  required  | string | Base URL of Joe Sandbox API
+**verify\_ssl** |  optional  | boolean | Verify Joe Sandbox Certificate
 **api\_key** |  required  | password | API Key
 **timeout** |  optional  | numeric | Detonation timeout \(30\-300 seconds\)
 **analysis\_time** |  optional  | numeric | Maximum time to complete detonation analysis \(30\-300 seconds\)
