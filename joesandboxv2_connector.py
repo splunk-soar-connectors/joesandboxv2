@@ -1,6 +1,6 @@
 # File: joesandboxv2_connector.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -140,10 +140,10 @@ class JoeSandboxV2Connector(BaseConnector):
                 return RetVal(action_result.set_status(
                     phantom.APP_ERROR, JOE_ERR_JSON_PARSE_MSG.format(raw_text=response.text.replace('{', '{{').replace('}', '}}')), e), None)
 
-            error_list = err_resp_json.get(JOE_JSON_ERRORS, [])
+            error_list = err_resp_json.get(JOE_JSON_ERRS, [])
 
             for error in error_list:
-                error_message = '{0}{1}{2}'.format(error_message, JOE_JSON_OR, error.get(JOE_JSON_MESSAGE, ''))
+                error_message = '{0}{1}{2}'.format(error_message, JOE_JSON_OR, error.get(JOE_JSON_MSG, ''))
 
             error_message = error_message.lstrip(JOE_JSON_OR)
 
