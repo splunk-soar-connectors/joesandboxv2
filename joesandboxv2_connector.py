@@ -26,6 +26,7 @@ import requests
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from phantom.vault import Vault
+from phantom_common import paths
 
 try:
     from urllib.parse import quote
@@ -608,7 +609,7 @@ class JoeSandboxV2Connector(BaseConnector):
             if hasattr(Vault, 'get_vault_tmp_dir'):
                 temp_dir = Vault.get_vault_tmp_dir()
             else:
-                temp_dir = 'opt/phantom/vault/tmp'
+                temp_dir = paths.PHANTOM_VAULT_TMP
             temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
             os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, filename)
