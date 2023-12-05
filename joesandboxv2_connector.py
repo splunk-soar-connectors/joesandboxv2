@@ -604,7 +604,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
         # Creating temporary directory and file
         try:
-            temp_dir = os.path.join(Vault.get_vault_tmp_dir(), uuid.uuid4())
+            temp_dir = os.path.join(Vault.get_vault_tmp_dir(), str(uuid.uuid4()))
             os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, filename)
             with open(file_path, open_mode) as file_obj:
