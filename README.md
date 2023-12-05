@@ -6,7 +6,7 @@ Connector Version: 2.1.0
 Product Vendor: Joe Security LLC  
 Product Name: Joe Sandbox v2  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.1.0  
+Minimum Product Version: 6.1.1  
 
 This app supports executing investigative actions to analyze files and URLs on Joe Sandbox
 
