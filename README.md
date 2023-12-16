@@ -6,7 +6,7 @@ Connector Version: 2.1.1
 Product Vendor: Joe Security LLC  
 Product Name: Joe Sandbox v2  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.3.0  
+Minimum Product Version: 6.1.1  
 
 This app supports executing investigative actions to analyze files and URLs on Joe Sandbox
 
@@ -757,6 +757,7 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string |  |   success  failed 
 action_result.parameter.id | string |  `joesandbox cookbook id`  |   9898 
+
 action_result.data.\*.code | string |  |   Script
 
 _JBSetSystem("{system}")
@@ -786,7 +787,6 @@ _JBStopAnalysis()
 _JBCleanUp()
 
 EndScript
-
  
 action_result.data.\*.comments | string |  |  
 action_result.data.\*.cookbook_file_name | string |  `file name`  |   Mac default cookbook.jbs 

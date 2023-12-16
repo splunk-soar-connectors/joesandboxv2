@@ -1,6 +1,6 @@
 # File: joesandboxv2_consts.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -83,8 +83,8 @@ JOE_JSON_ID = 'id'
 JOE_JSON_URL = 'url'
 JOE_JSON_HASH = 'hash'
 JOE_JSON_FILE_VAULT_ID = 'vault_id'
-JOE_JSON_ERRORS = 'errors'
-JOE_JSON_MESSAGE = 'message'
+JOE_JSON_ERRS = 'errors'
+JOE_JSON_MSG = 'message'
 JOE_JSON_ANALYSIS = 'analysis'
 JOE_JSON_COOKBOOK = 'cookbook'
 JOE_JSON_NAME = 'name'

@@ -1,6 +1,6 @@
 # File: joesandboxv2_connector.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -123,9 +123,8 @@ class JoeSandboxV2Connector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     @staticmethod
-    def _get_error_message(response, action_result):
+    def _get_err_msg(response, action_result):
         """ This function is used to get appropriate error message from error response
-
         :param response: Response data
         :param action_result: Object of Action Result
         :return: error_message
@@ -139,10 +138,10 @@ class JoeSandboxV2Connector(BaseConnector):
                 return RetVal(action_result.set_status(
                     phantom.APP_ERROR, JOE_ERR_JSON_PARSE_MSG.format(raw_text=response.text.replace('{', '{{').replace('}', '}}')), e), None)
 
-            error_list = err_resp_json.get(JOE_JSON_ERRORS, [])
+            err_list = err_resp_json.get(JOE_JSON_ERRS, [])
 
-            for error in error_list:
-                error_message = '{0}{1}{2}'.format(error_message, JOE_JSON_OR, error.get(JOE_JSON_MESSAGE, ''))
+            for error in err_list:
+                error_message = '{0}{1}{2}'.format(error_message, JOE_JSON_OR, error.get(JOE_JSON_MSG, ''))
 
             error_message = error_message.lstrip(JOE_JSON_OR)
 
@@ -159,7 +158,7 @@ class JoeSandboxV2Connector(BaseConnector):
         response_data = None
 
         if response.status_code not in (200, 399):
-            error_message = self._get_error_message(response, action_result)
+            error_message = self._get_err_msg(response, action_result)
             return RetVal(action_result.set_status(phantom.APP_ERROR, JOE_ERR_FROM_SERVER_MSG.format(
                 status=response.status_code, reason=error_message)), response_data)
 
@@ -168,7 +167,7 @@ class JoeSandboxV2Connector(BaseConnector):
         except Exception as e:
             self._dump_error_log(e)
             error_msg = JOE_ERR_JSON_PARSE_MSG.format(raw_text=response.text.replace('{', '{{').replace('}', '}}'))
-            error_msg = "{}. {}".format(error_msg, self._get_error_message_from_exception(e))
+            error_msg = "{}. {}".format(error_msg, self._get_err_msg_from_exception(e))
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_msg), response_data)
 
         if response.status_code == JOE_JSON_RESP_SUCCESS_RESPONSE:
@@ -202,7 +201,7 @@ class JoeSandboxV2Connector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_SUCCESS), {JOE_JSON_RESPONSE: r.content,
                                                                           JOE_JSON_RESPONSE_HEADERS: r.headers})
         elif r.status_code not in (200, 399) and self.get_action_identifier() in [JOE_ACTION_GET_REPORT, JOE_ACTION_GET_PCAP]:
-            error_message = self._get_error_message(r, action_result)
+            error_message = self._get_err_msg(r, action_result)
             return RetVal(action_result.set_status(phantom.APP_ERROR, JOE_ERR_FROM_SERVER_MSG.format(
                 status=r.status_code, reason=error_message)), None)
 
@@ -227,7 +226,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _get_error_message_from_exception(self, e):
+    def _get_err_msg_from_exception(self, e):
         """ This method is used to get appropriate error message from the exception.
         :param e: Exception object
         :return: error message
@@ -287,7 +286,7 @@ class JoeSandboxV2Connector(BaseConnector):
         except Exception as error:
             self._dump_error_log(error)
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_SERVER_CONNECTION_MSG,
-                                            self._get_error_message_from_exception(error)), response_data
+                                            self._get_err_msg_from_exception(error)), response_data
 
         return self._process_response(response, action_result)
 
@@ -370,7 +369,7 @@ class JoeSandboxV2Connector(BaseConnector):
         except Exception as e:
             self._dump_error_log(e)
             return (action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details. Error details: {0}'.format(
-                self._get_error_message_from_exception(e))), None)
+                self._get_err_msg_from_exception(e))), None)
 
         for file_data in files_array:
             if file_data[JOE_JSON_FILE_VAULT_ID] == file_vault_id:
@@ -538,7 +537,7 @@ class JoeSandboxV2Connector(BaseConnector):
             response_json = json.loads(response_data[JOE_JSON_RESPONSE]).get('data', {})
         except Exception as e:
             self._dump_error_log(e)
-            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=self._get_error_message_from_exception(e))), None
+            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=self._get_err_msg_from_exception(e))), None
 
         # Report of the sample will be downloaded only if analysis of sample is finished
         if response_json.get(JOE_JSON_STATUS) != JOE_JSON_FINISHED:
@@ -605,17 +604,13 @@ class JoeSandboxV2Connector(BaseConnector):
 
         # Creating temporary directory and file
         try:
-            if hasattr(Vault, 'get_vault_tmp_dir'):
-                temp_dir = Vault.get_vault_tmp_dir()
-            else:
-                temp_dir = 'opt/phantom/vault/tmp'
-            temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
+            temp_dir = os.path.join(Vault.get_vault_tmp_dir(), str(uuid.uuid4()))
             os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, filename)
             with open(file_path, open_mode) as file_obj:
                 file_obj.write(content)
         except IOError as e:
-            error_msg = self._get_error_message_from_exception(e)
+            error_msg = self._get_err_msg_from_exception(e)
             try:
                 # Handling "Filename too long"/"File name too long"
                 if "too long" in error_msg:
@@ -628,14 +623,14 @@ class JoeSandboxV2Connector(BaseConnector):
                         _temp_file.write(content)
                 else:
                     return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error details: {}".format(
-                        self._get_error_message_from_exception(e))), None
+                        self._get_err_msg_from_exception(e))), None
             except Exception as e:
                 self._dump_error_log(e)
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error details: {}".format(
-                    self._get_error_message_from_exception(e))), None
+                    self._get_err_msg_from_exception(e))), None
         except Exception as e:
             self._dump_error_log(e, JOE_ERR_FILE_MSG)
-            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_FILE_MSG, self._get_error_message_from_exception(e)), None
+            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_FILE_MSG, self._get_err_msg_from_exception(e)), None
 
         try:
             # Check if report with same file name is already available in vault
@@ -926,7 +921,7 @@ class JoeSandboxV2Connector(BaseConnector):
                 except Exception as e:
                     self._dump_error_log(e)
                     return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(
-                        error=self._get_error_message_from_exception(e))), None
+                        error=self._get_err_msg_from_exception(e))), None
 
         # Required fields to be extracted from the response obtained
         overview_info_keys = {
