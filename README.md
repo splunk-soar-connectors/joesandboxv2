@@ -757,7 +757,6 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string |  |   success  failed 
 action_result.parameter.id | string |  `joesandbox cookbook id`  |   9898 
-
 action_result.data.\*.code | string |  |   Script
 
 _JBSetSystem("{system}")
@@ -787,6 +786,7 @@ _JBStopAnalysis()
 _JBCleanUp()
 
 EndScript
+
  
 action_result.data.\*.comments | string |  |  
 action_result.data.\*.cookbook_file_name | string |  `file name`  |   Mac default cookbook.jbs 
