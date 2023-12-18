@@ -2,7 +2,7 @@
 # Joe Sandbox v2
 
 Publisher: Splunk  
-Connector Version: 2.1.1  
+Connector Version: 2.1.2  
 Product Vendor: Joe Security LLC  
 Product Name: Joe Sandbox v2  
 Product Version Supported (regex): ".\*"  
