@@ -2,7 +2,7 @@
 # Joe Sandbox v2
 
 Publisher: Splunk  
-Connector Version: 2.1.1  
+Connector Version: 2.1.2  
 Product Vendor: Joe Security LLC  
 Product Name: Joe Sandbox v2  
 Product Version Supported (regex): ".\*"  
@@ -11,7 +11,7 @@ Minimum Product Version: 6.1.1
 This app supports executing investigative actions to analyze files and URLs on Joe Sandbox
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2022 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2023 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
