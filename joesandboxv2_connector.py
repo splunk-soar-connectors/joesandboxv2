@@ -858,7 +858,7 @@ class JoeSandboxV2Connector(BaseConnector):
 
         # Calculating number of times polling should be done based on timeout seconds provided by user.
         # Polling will be done at an interval of 30 sec
-        num_polls = int(math.ceil(self._detonate_timeout / JOE_SLEEP_SECS))
+        num_polls = math.ceil(self._detonate_timeout / JOE_SLEEP_SECS)
 
         polling_attempt = 0
 
