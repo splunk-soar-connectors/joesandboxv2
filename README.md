@@ -1,9 +1,9 @@
 # Joe Sandbox v2
 
-Publisher: Splunk \
-Connector Version: 2.1.2 \
-Product Vendor: Joe Security LLC \
-Product Name: Joe Sandbox v2 \
+Publisher: Splunk <br>
+Connector Version: 2.1.2 <br>
+Product Vendor: Joe Security LLC <br>
+Product Name: Joe Sandbox v2 <br>
 Minimum Product Version: 6.1.1
 
 This app supports executing investigative actions to analyze files and URLs on Joe Sandbox
@@ -39,22 +39,22 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration \
-[detonate file](#action-detonate-file) - Retrieve detonation analysis results for file \
-[get pcap](#action-get-pcap) - Download the pcap file and add it to the vault \
-[get report](#action-get-report) - Download the detonation report and add it to the vault \
-[check status](#action-check-status) - Check status of sample file or URL submitted for analysis \
-[detonate url](#action-detonate-url) - Retrieve detonation analysis results for URL \
-[url reputation](#action-url-reputation) - Query Joe Sandbox for URL reputation \
-[file reputation](#action-file-reputation) - Query Joe Sandbox for file reputation \
-[list cookbooks](#action-list-cookbooks) - List all cookbooks \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration <br>
+[detonate file](#action-detonate-file) - Retrieve detonation analysis results for file <br>
+[get pcap](#action-get-pcap) - Download the pcap file and add it to the vault <br>
+[get report](#action-get-report) - Download the detonation report and add it to the vault <br>
+[check status](#action-check-status) - Check status of sample file or URL submitted for analysis <br>
+[detonate url](#action-detonate-url) - Retrieve detonation analysis results for URL <br>
+[url reputation](#action-url-reputation) - Query Joe Sandbox for URL reputation <br>
+[file reputation](#action-file-reputation) - Query Joe Sandbox for file reputation <br>
+[list cookbooks](#action-list-cookbooks) - List all cookbooks <br>
 [get cookbook](#action-get-cookbook) - Get a cookbook and add it to vault
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity using supplied configuration
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -69,7 +69,7 @@ No Output
 
 Retrieve detonation analysis results for file
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If report_cache is enabled, action checks the cache for existing reports before running a full analysis and returns the latest analysis report from the cache. If disabled, it always spawns a new analysis. If action is unable to find the file from vault using cookbook_vault_id, then action will submit analysis without cookbook parameter.
@@ -197,7 +197,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Download the pcap file and add it to the vault
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -223,7 +223,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Download the detonation report and add it to the vault
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -448,7 +448,7 @@ summary.total_objects_successful | numeric | | 2 |
 
 Check status of sample file or URL submitted for analysis
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -488,7 +488,7 @@ summary.total_objects_successful | numeric | | 2 |
 
 Retrieve detonation analysis results for URL
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If report_cache is enabled, action checks the cache for existing reports before running a full analysis and returns the latest analysis report from the cache. If disabled, it always spawns a new analysis.
@@ -655,7 +655,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Query Joe Sandbox for URL reputation
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -693,7 +693,7 @@ summary.total_objects_successful | numeric | | 2 |
 
 Query Joe Sandbox for file reputation
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -734,7 +734,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List all cookbooks
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -757,7 +757,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get a cookbook and add it to vault
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
