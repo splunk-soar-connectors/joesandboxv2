@@ -435,7 +435,7 @@ class JoeSandboxV2Connector(BaseConnector):
             json_response_status, json_response_data = self._get_json_report(response_data.get(JOE_JSON_WEBID), action_result)
 
             if phantom.is_fail(json_response_status):
-                return action_result.set_status(phantom.APP_SUCCESS)
+                return action_result.get_status()
 
             # Overriding value of keys containing file name and cookbook name with encoded file name and encoded
             # cookbook name respectively, try to be as safe as possible
@@ -818,7 +818,7 @@ class JoeSandboxV2Connector(BaseConnector):
             json_response_status, json_response_data = self._get_json_report(response_data.get(JOE_JSON_WEBID), action_result)
 
             if phantom.is_fail(json_response_status):
-                return action_result.set_status(phantom.APP_SUCCESS)
+                return action_result.get_status()
 
             response = {JOE_JSON_SAMPLE_STATUS: response_data, JOE_JSON_SAMPLE_DETAILS: json_response_data}
         else:
@@ -898,7 +898,17 @@ class JoeSandboxV2Connector(BaseConnector):
             if response_data[JOE_JSON_RESPONSE][JOE_JSON_STATUS] == JOE_JSON_FINISHED:
                 break
 
-        return phantom.APP_SUCCESS, response_data.get(JOE_JSON_RESPONSE, {})
+        sample_status = response_data.get(JOE_JSON_RESPONSE, {})
+        if sample_status.get(JOE_JSON_STATUS) != JOE_JSON_FINISHED:
+            return (
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Analysis {webid} did not finish within the configured detonation timeout",
+                ),
+                None,
+            )
+
+        return phantom.APP_SUCCESS, sample_status
 
     def _get_json_report(self, webid, action_result):
         """This is helper method to get json report of sample
