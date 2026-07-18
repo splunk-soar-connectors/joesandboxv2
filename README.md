@@ -198,7 +198,7 @@ summary.total_objects_successful | numeric | | 1 |
 Download the pcap file and add it to the vault
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 
@@ -224,7 +224,7 @@ summary.total_objects_successful | numeric | | 1 |
 Download the detonation report and add it to the vault
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 

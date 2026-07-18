@@ -956,7 +956,7 @@
             "identifier": "get_pcap",
             "description": "Download the pcap file and add it to the vault",
             "type": "investigate",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "id": {
                     "description": "Web ID of JoeSandbox analysis process",
@@ -1056,7 +1056,7 @@
             "identifier": "get_report",
             "description": "Download the detonation report and add it to the vault",
             "type": "investigate",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "id": {
                     "description": "Web ID of JoeSandbox analysis process",
