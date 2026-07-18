@@ -19,6 +19,7 @@ import shutil
 import sys
 import time
 import uuid
+from email.message import Message
 
 import phantom.app as phantom
 import phantom.rules as ph_rules
@@ -583,7 +584,11 @@ class JoeSandboxV2Connector(BaseConnector):
             self.debug_print(JOE_ERR_REPORT_FILENAME_NOT_FOUND_MSG)
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_REPORT_FILENAME_NOT_FOUND_MSG), None
 
-        filename = response[JOE_JSON_RESPONSE_HEADERS][JOE_JSON_CONTENT_DISPOSITION].split("filename=")[1][1:-2]
+        content_disposition = Message()
+        content_disposition["content-disposition"] = response[JOE_JSON_RESPONSE_HEADERS][JOE_JSON_CONTENT_DISPOSITION]
+        filename = content_disposition.get_filename()
+        if not filename:
+            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_REPORT_FILENAME_NOT_FOUND_MSG), None
 
         return_val, vault_details = self._save_file_to_vault(filename, container_id, response[JOE_JSON_RESPONSE], action_result)
 
@@ -603,6 +608,10 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        filename = os.path.basename(str(filename).replace("\\", "/"))
+        if filename in {"", ".", ".."}:
+            return action_result.set_status(phantom.APP_ERROR, "The report filename is invalid"), None
+
         if isinstance(content, bytes):
             open_mode = "wb"
         else:
@@ -612,7 +621,9 @@ class JoeSandboxV2Connector(BaseConnector):
         try:
             temp_dir = os.path.join(Vault.get_vault_tmp_dir(), str(uuid.uuid4()))
             os.makedirs(temp_dir)
-            file_path = os.path.join(temp_dir, filename)
+            file_path = os.path.realpath(os.path.join(temp_dir, filename))
+            if os.path.commonpath((os.path.realpath(temp_dir), file_path)) != os.path.realpath(temp_dir):
+                return action_result.set_status(phantom.APP_ERROR, "The report filename resolves outside the temporary directory"), None
             with open(file_path, open_mode) as file_obj:
                 file_obj.write(content)
         except OSError as e:
