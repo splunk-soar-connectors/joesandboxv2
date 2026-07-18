@@ -5,3 +5,4 @@
 - Escaped check-status widget values before embedding them in JavaScript (PSAAS-30932).
 - Escaped every dynamic context-menu value in the connector widgets (PSAAS-31197).
 - Reported incomplete analyses and report-retrieval failures as detonation errors (PSAAS-31796).
+- Derived reputation from the worst completed run and returned unknown for missing verdicts (PSAAS-32232).

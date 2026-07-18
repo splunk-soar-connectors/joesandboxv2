@@ -59,6 +59,26 @@ class JoeSandboxV2Connector(BaseConnector):
         self._detonate_timeout = JOE_TIME_DEFAULT
         self._analysis_time = JOE_TIME_DEFAULT
 
+    @staticmethod
+    def _derive_reputation_label(sample_status):
+        if sample_status.get(JOE_JSON_STATUS) != JOE_JSON_FINISHED:
+            return JOE_JSON_UNKNOWN
+
+        detections = [
+            str(run.get(JOE_JSON_DETECTION, "")).strip().lower()
+            for run in sample_status.get(JOE_JSON_RUNS, [])
+            if isinstance(run, dict)
+        ]
+        if not detections or any(not detection for detection in detections):
+            return JOE_JSON_UNKNOWN
+        if any(detection in {"malicious", "phishing"} for detection in detections):
+            return "malicious"
+        if "suspicious" in detections:
+            return "suspicious"
+        if any(detection != JOE_JSON_CLEAN for detection in detections):
+            return JOE_JSON_UNKNOWN
+        return JOE_JSON_CLEAN
+
     def _parse_response(self, response):
         """This method is used to strip semicolons from response
 
@@ -747,13 +767,7 @@ class JoeSandboxV2Connector(BaseConnector):
         # Adding a new key in the data which contains the reputation of the file or URL, defined based on 'runs --> detection'
         # parameter available in data
         self.debug_print("Processing the response")
-        reputation_detection_list = response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_RUNS, [])
-
-        if reputation_detection_list and len(reputation_detection_list) > 0:
-            for reputation_item in reputation_detection_list:
-                response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = reputation_item.get(JOE_JSON_DETECTION, JOE_JSON_CLEAN)
-        else:
-            response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = JOE_JSON_CLEAN
+        response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = self._derive_reputation_label(response_data[JOE_JSON_RESPONSE])
 
         summary_data.update({JOE_JSON_STATUS: response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_STATUS)})
 
@@ -1039,13 +1053,7 @@ class JoeSandboxV2Connector(BaseConnector):
         # Adding a new key in the data which contains the reputation of the file or URL, defined based on 'runs --> detection'
         # parameter available in data
         self.debug_print("Processing the response")
-        reputation_detection_list = response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_RUNS, [])
-
-        if reputation_detection_list and len(reputation_detection_list) > 0:
-            for reputation_item in reputation_detection_list:
-                response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = reputation_item.get(JOE_JSON_DETECTION, JOE_JSON_CLEAN)
-        else:
-            response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = JOE_JSON_CLEAN
+        response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = self._derive_reputation_label(response_data[JOE_JSON_RESPONSE])
 
         summary_data.update(
             {
@@ -1110,13 +1118,7 @@ class JoeSandboxV2Connector(BaseConnector):
         # Adding a new key in the data which contains the reputation of the file or URL, defined based on 'runs --> detection'
         # parameter available in data
         self.debug_print("Processing the response")
-        reputation_detection_list = response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_RUNS, [])
-
-        if reputation_detection_list and len(reputation_detection_list) > 0:
-            for reputation_item in reputation_detection_list:
-                response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = reputation_item.get(JOE_JSON_DETECTION, JOE_JSON_CLEAN)
-        else:
-            response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = JOE_JSON_CLEAN
+        response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = self._derive_reputation_label(response_data[JOE_JSON_RESPONSE])
 
         summary_data.update(
             {
