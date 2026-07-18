@@ -1,6 +1,6 @@
 # File: joesandboxv2_connector.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,9 +65,7 @@ class JoeSandboxV2Connector(BaseConnector):
             return JOE_JSON_UNKNOWN
 
         detections = [
-            str(run.get(JOE_JSON_DETECTION, "")).strip().lower()
-            for run in sample_status.get(JOE_JSON_RUNS, [])
-            if isinstance(run, dict)
+            str(run.get(JOE_JSON_DETECTION, "")).strip().lower() for run in sample_status.get(JOE_JSON_RUNS, []) if isinstance(run, dict)
         ]
         if not detections or any(not detection for detection in detections):
             return JOE_JSON_UNKNOWN
