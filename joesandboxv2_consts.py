@@ -1,6 +1,6 @@
 # File: joesandboxv2_consts.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -131,6 +131,7 @@ JOE_JSON_CALL = "call"
 JOE_JSON_RUNS = "runs"
 JOE_JSON_DETECTION = "detection"
 JOE_JSON_CLEAN = "clean"
+JOE_JSON_UNKNOWN = "unknown"
 JOE_JSON_CODE = "code"
 JOE_JSON_JBS = ".jbs"
 JOE_JSON_Q = "q"

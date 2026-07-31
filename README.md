@@ -198,7 +198,7 @@ summary.total_objects_successful | numeric | | 1 |
 Download the pcap file and add it to the vault
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 
@@ -224,7 +224,7 @@ summary.total_objects_successful | numeric | | 1 |
 Download the detonation report and add it to the vault
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 
@@ -815,7 +815,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -9,7 +9,7 @@
     "product_name": "Joe Sandbox v2",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2025 Splunk Inc.",
+    "license": "Copyright (c) 2019-2026 Splunk Inc.",
     "app_version": "2.1.3",
     "utctime_updated": "2025-09-05T16:37:07.977642Z",
     "package_name": "phantom_joesandboxv2",
@@ -956,7 +956,7 @@
             "identifier": "get_pcap",
             "description": "Download the pcap file and add it to the vault",
             "type": "investigate",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "id": {
                     "description": "Web ID of JoeSandbox analysis process",
@@ -1056,7 +1056,7 @@
             "identifier": "get_report",
             "description": "Download the detonation report and add it to the vault",
             "type": "investigate",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "id": {
                     "description": "Web ID of JoeSandbox analysis process",

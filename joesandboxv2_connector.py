@@ -1,6 +1,6 @@
 # File: joesandboxv2_connector.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import shutil
 import sys
 import time
 import uuid
+from email.message import Message
 
 import phantom.app as phantom
 import phantom.rules as ph_rules
@@ -57,6 +58,24 @@ class JoeSandboxV2Connector(BaseConnector):
 
         self._detonate_timeout = JOE_TIME_DEFAULT
         self._analysis_time = JOE_TIME_DEFAULT
+
+    @staticmethod
+    def _derive_reputation_label(sample_status):
+        if sample_status.get(JOE_JSON_STATUS) != JOE_JSON_FINISHED:
+            return JOE_JSON_UNKNOWN
+
+        detections = [
+            str(run.get(JOE_JSON_DETECTION, "")).strip().lower() for run in sample_status.get(JOE_JSON_RUNS, []) if isinstance(run, dict)
+        ]
+        if not detections or any(not detection for detection in detections):
+            return JOE_JSON_UNKNOWN
+        if any(detection in {"malicious", "phishing"} for detection in detections):
+            return "malicious"
+        if "suspicious" in detections:
+            return "suspicious"
+        if any(detection != JOE_JSON_CLEAN for detection in detections):
+            return JOE_JSON_UNKNOWN
+        return JOE_JSON_CLEAN
 
     def _parse_response(self, response):
         """This method is used to strip semicolons from response
@@ -434,7 +453,7 @@ class JoeSandboxV2Connector(BaseConnector):
             json_response_status, json_response_data = self._get_json_report(response_data.get(JOE_JSON_WEBID), action_result)
 
             if phantom.is_fail(json_response_status):
-                return action_result.set_status(phantom.APP_SUCCESS)
+                return action_result.get_status()
 
             # Overriding value of keys containing file name and cookbook name with encoded file name and encoded
             # cookbook name respectively, try to be as safe as possible
@@ -583,7 +602,11 @@ class JoeSandboxV2Connector(BaseConnector):
             self.debug_print(JOE_ERR_REPORT_FILENAME_NOT_FOUND_MSG)
             return action_result.set_status(phantom.APP_ERROR, JOE_ERR_REPORT_FILENAME_NOT_FOUND_MSG), None
 
-        filename = response[JOE_JSON_RESPONSE_HEADERS][JOE_JSON_CONTENT_DISPOSITION].split("filename=")[1][1:-2]
+        content_disposition = Message()
+        content_disposition["content-disposition"] = response[JOE_JSON_RESPONSE_HEADERS][JOE_JSON_CONTENT_DISPOSITION]
+        filename = content_disposition.get_filename()
+        if not filename:
+            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_REPORT_FILENAME_NOT_FOUND_MSG), None
 
         return_val, vault_details = self._save_file_to_vault(filename, container_id, response[JOE_JSON_RESPONSE], action_result)
 
@@ -603,6 +626,10 @@ class JoeSandboxV2Connector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
+        filename = os.path.basename(str(filename).replace("\\", "/"))
+        if filename in {"", ".", ".."}:
+            return action_result.set_status(phantom.APP_ERROR, "The report filename is invalid"), None
+
         if isinstance(content, bytes):
             open_mode = "wb"
         else:
@@ -612,7 +639,9 @@ class JoeSandboxV2Connector(BaseConnector):
         try:
             temp_dir = os.path.join(Vault.get_vault_tmp_dir(), str(uuid.uuid4()))
             os.makedirs(temp_dir)
-            file_path = os.path.join(temp_dir, filename)
+            file_path = os.path.realpath(os.path.join(temp_dir, filename))
+            if os.path.commonpath((os.path.realpath(temp_dir), file_path)) != os.path.realpath(temp_dir):
+                return action_result.set_status(phantom.APP_ERROR, "The report filename resolves outside the temporary directory"), None
             with open(file_path, open_mode) as file_obj:
                 file_obj.write(content)
         except OSError as e:
@@ -736,13 +765,7 @@ class JoeSandboxV2Connector(BaseConnector):
         # Adding a new key in the data which contains the reputation of the file or URL, defined based on 'runs --> detection'
         # parameter available in data
         self.debug_print("Processing the response")
-        reputation_detection_list = response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_RUNS, [])
-
-        if reputation_detection_list and len(reputation_detection_list) > 0:
-            for reputation_item in reputation_detection_list:
-                response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = reputation_item.get(JOE_JSON_DETECTION, JOE_JSON_CLEAN)
-        else:
-            response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = JOE_JSON_CLEAN
+        response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = self._derive_reputation_label(response_data[JOE_JSON_RESPONSE])
 
         summary_data.update({JOE_JSON_STATUS: response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_STATUS)})
 
@@ -807,7 +830,7 @@ class JoeSandboxV2Connector(BaseConnector):
             json_response_status, json_response_data = self._get_json_report(response_data.get(JOE_JSON_WEBID), action_result)
 
             if phantom.is_fail(json_response_status):
-                return action_result.set_status(phantom.APP_SUCCESS)
+                return action_result.get_status()
 
             response = {JOE_JSON_SAMPLE_STATUS: response_data, JOE_JSON_SAMPLE_DETAILS: json_response_data}
         else:
@@ -887,7 +910,17 @@ class JoeSandboxV2Connector(BaseConnector):
             if response_data[JOE_JSON_RESPONSE][JOE_JSON_STATUS] == JOE_JSON_FINISHED:
                 break
 
-        return phantom.APP_SUCCESS, response_data.get(JOE_JSON_RESPONSE, {})
+        sample_status = response_data.get(JOE_JSON_RESPONSE, {})
+        if sample_status.get(JOE_JSON_STATUS) != JOE_JSON_FINISHED:
+            return (
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Analysis {webid} did not finish within the configured detonation timeout",
+                ),
+                None,
+            )
+
+        return phantom.APP_SUCCESS, sample_status
 
     def _get_json_report(self, webid, action_result):
         """This is helper method to get json report of sample
@@ -1018,13 +1051,7 @@ class JoeSandboxV2Connector(BaseConnector):
         # Adding a new key in the data which contains the reputation of the file or URL, defined based on 'runs --> detection'
         # parameter available in data
         self.debug_print("Processing the response")
-        reputation_detection_list = response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_RUNS, [])
-
-        if reputation_detection_list and len(reputation_detection_list) > 0:
-            for reputation_item in reputation_detection_list:
-                response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = reputation_item.get(JOE_JSON_DETECTION, JOE_JSON_CLEAN)
-        else:
-            response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = JOE_JSON_CLEAN
+        response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = self._derive_reputation_label(response_data[JOE_JSON_RESPONSE])
 
         summary_data.update(
             {
@@ -1089,13 +1116,7 @@ class JoeSandboxV2Connector(BaseConnector):
         # Adding a new key in the data which contains the reputation of the file or URL, defined based on 'runs --> detection'
         # parameter available in data
         self.debug_print("Processing the response")
-        reputation_detection_list = response_data.get(JOE_JSON_RESPONSE, {}).get(JOE_JSON_RUNS, [])
-
-        if reputation_detection_list and len(reputation_detection_list) > 0:
-            for reputation_item in reputation_detection_list:
-                response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = reputation_item.get(JOE_JSON_DETECTION, JOE_JSON_CLEAN)
-        else:
-            response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = JOE_JSON_CLEAN
+        response_data[JOE_JSON_RESPONSE][JOE_JSON_REPUTATION_LABEL] = self._derive_reputation_label(response_data[JOE_JSON_RESPONSE])
 
         summary_data.update(
             {

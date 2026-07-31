@@ -11,7 +11,7 @@
 {% block widget_content %}
   <!-- Main Start Block -->
   <!-- File: joesandboxv2_sample_details.html
-  Copyright (c) 2019-2025 Splunk Inc.
+  Copyright (c) 2019-2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -137,7 +137,7 @@ and limitations under the License.
                 <tr>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['joesandbox task id'], 'value': '{{ result.param.id }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['joesandbox task id'], 'value': '{{ result.param.id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.param.id }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -145,7 +145,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.download_report_details.report_file_name }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.download_report_details.report_file_name|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.download_report_details.report_file_name }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -153,7 +153,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['vault id'], 'value': '{{ result.data.download_report_details.vault_id }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['vault id'], 'value': '{{ result.data.download_report_details.vault_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.download_report_details.vault_id }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -188,7 +188,7 @@ and limitations under the License.
                 <tr>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['joesandbox task id'], 'value': '{{ result.data.sample_status.webid }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['joesandbox task id'], 'value': '{{ result.data.sample_status.webid|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.sample_status.webid }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -196,7 +196,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_status.filename }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_status.filename|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.sample_status.filename }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -204,7 +204,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_status.scriptname }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_status.scriptname|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.sample_status.scriptname }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -212,7 +212,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ result.data.sample_status.sha256 }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ result.data.sample_status.sha256|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.sample_status.sha256 }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -220,7 +220,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ result.data.sample_status.md5 }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ result.data.sample_status.md5|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.sample_status.md5 }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -228,7 +228,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ result.data.sample_status.sha1 }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ result.data.sample_status.sha1|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.sample_status.sha1 }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -261,7 +261,7 @@ and limitations under the License.
                 <tr>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['joesandbox task id'], 'value': '{{ result.data.sample_status.webid }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['joesandbox task id'], 'value': '{{ result.data.sample_status.webid|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.sample_status.webid }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -269,7 +269,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ result.data.sample_status.url }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ result.data.sample_status.url|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.sample_status.url }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -277,7 +277,7 @@ and limitations under the License.
                   </td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_status.scriptname }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_status.scriptname|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ result.data.sample_status.scriptname }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -351,7 +351,7 @@ and limitations under the License.
                           <th>Sample file name:</th>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_details.generalinfo.target.sample }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_details.generalinfo.target.sample|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ result.data.sample_details.generalinfo.target.sample }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -362,7 +362,7 @@ and limitations under the License.
                           <th>Cookbook file name:</th>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_details.generalinfo.target.cookbook }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_details.generalinfo.target.cookbook|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ result.data.sample_details.generalinfo.target.cookbook }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -480,7 +480,7 @@ and limitations under the License.
                           <tr>
                             <td>
                               <a href="javascript:;"
-                                 onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ domain_info|by_key:'@name' }}' }], 0, {{ container.id }}, null, false);">
+                                 onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ domain_info|by_key:'@name'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                 {{ domain_info|by_key:"@name" }}
                                 &nbsp;
                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -488,7 +488,7 @@ and limitations under the License.
                             </td>
                             <td>
                               <a href="javascript:;"
-                                 onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ domain_info|by_key:'@ip' }}' }], 0, {{ container.id }}, null, false);">
+                                 onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ domain_info|by_key:'@ip'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                 {{ domain_info|by_key:"@ip" }}
                                 &nbsp;
                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -535,7 +535,7 @@ and limitations under the License.
                           <tr>
                             <td>
                               <a href="javascript:;"
-                                 onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ ip_info|by_key:'@ip' }}' }], 0, {{ container.id }}, null, false);">
+                                 onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ ip_info|by_key:'@ip'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                 {{ ip_info|by_key:"@ip" }}
                                 &nbsp;
                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -589,7 +589,7 @@ and limitations under the License.
                           <th>File name:</th>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_details.fileinfo.filename }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ result.data.sample_details.fileinfo.filename|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ result.data.sample_details.fileinfo.filename }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -604,7 +604,7 @@ and limitations under the License.
                           <th>MD5:</th>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ result.data.sample_details.fileinfo.md5 }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ result.data.sample_details.fileinfo.md5|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ result.data.sample_details.fileinfo.md5 }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -615,7 +615,7 @@ and limitations under the License.
                           <th>SHA1:</th>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ result.data.sample_details.fileinfo.sha1 }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ result.data.sample_details.fileinfo.sha1|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ result.data.sample_details.fileinfo.sha1 }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -626,7 +626,7 @@ and limitations under the License.
                           <th>SHA256:</th>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ result.data.sample_details.fileinfo.sha256 }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ result.data.sample_details.fileinfo.sha256|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ result.data.sample_details.fileinfo.sha256 }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -678,7 +678,7 @@ and limitations under the License.
                           <tr>
                             <td>
                               <a href="javascript:;"
-                                 onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ dropped_info|by_key:'@file' }}' }], 0, {{ container.id }}, null, false);">
+                                 onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ dropped_info|by_key:'@file'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                 {{ dropped_info|by_key:"@file" }}
                                 &nbsp;
                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -693,7 +693,7 @@ and limitations under the License.
                                   {% elif hash|by_key:"@algo" == "MD5" %}
                                     <li>
                                       MD5: <a href="javascript:;"
-    onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ hash|by_key:'$' }}' }], 0, {{ container.id }}, null, false);">
+    onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ hash|by_key:'$'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                       {{ hash|by_key:"$" }}
                                       &nbsp;
                                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -702,7 +702,7 @@ and limitations under the License.
                                 {% elif hash|by_key:"@algo" == "SHA" %}
                                   <li>
                                     SHA1: <a href="javascript:;"
-    onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ hash|by_key:'$' }}' }], 0, {{ container.id }}, null, false);">
+    onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ hash|by_key:'$'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                     {{ hash|by_key:"$" }}
                                     &nbsp;
                                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -711,7 +711,7 @@ and limitations under the License.
                               {% elif hash|by_key:"@algo" == "SHA-256" %}
                                 <li>
                                   SHA256: <a href="javascript:;"
-    onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ hash|by_key:'$' }}' }], 0, {{ container.id }}, null, false);">
+    onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ hash|by_key:'$'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                   {{ hash|by_key:"$" }}
                                   &nbsp;
                                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -799,7 +799,7 @@ and limitations under the License.
                                     <th>Path:</th>
                                     <td>
                                       <a href="javascript:;"
-                                         onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ module_data.general.path }}' }], 0, {{ container.id }}, null, false);">
+                                         onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ module_data.general.path|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                         {{ module_data.general.path }}
                                         &nbsp;
                                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -826,7 +826,7 @@ and limitations under the License.
                                     <th>MD5 Hash:</th>
                                     <td>
                                       <a href="javascript:;"
-                                         onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ module_data.general.md5 }}' }], 0, {{ container.id }}, null, false);">
+                                         onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ module_data.general.md5|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                         {{ module_data.general.md5 }}
                                         &nbsp;
                                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -888,7 +888,7 @@ and limitations under the License.
                                           <tr>
                                             <td>
                                               <a href="javascript:;"
-                                                 onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ file_data.path }}' }], 0, {{ container.id }}, null, false);">
+                                                 onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ file_data.path|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                                 {{ file_data.path }}
                                                 &nbsp;
                                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -943,7 +943,7 @@ and limitations under the License.
                                           <tr>
                                             <td>
                                               <a href="javascript:;"
-                                                 onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ file_data.path }}' }], 0, {{ container.id }}, null, false);">
+                                                 onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ file_data.path|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                                 {{ file_data.path }}
                                                 &nbsp;
                                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -951,7 +951,7 @@ and limitations under the License.
                                             </td>
                                             <td>
                                               <a href="javascript:;"
-                                                 onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ file_data.newpath }}' }], 0, {{ container.id }}, null, false);">
+                                                 onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ file_data.newpath|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                                 {{ file_data.newpath }}
                                                 &nbsp;
                                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
