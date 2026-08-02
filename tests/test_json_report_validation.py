@@ -12,6 +12,10 @@ class JsonReportValidationTestCase(unittest.TestCase):
         response = {JOE_JSON_RESPONSE: {JOE_JSON_ANALYSIS: {}}}
         self.assertIsNone(get_nonempty_report_analysis(response))
 
+    def test_nonempty_but_unusable_analysis_fails(self):
+        response = {JOE_JSON_RESPONSE: {JOE_JSON_ANALYSIS: {"generalinfo": {}}}}
+        self.assertIsNone(get_nonempty_report_analysis(response))
+
     def test_nonempty_analysis_passes(self):
         analysis = {"generalinfo": {"target": "sample"}}
         response = {JOE_JSON_RESPONSE: {JOE_JSON_ANALYSIS: analysis}}
