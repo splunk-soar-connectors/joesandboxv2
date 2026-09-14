@@ -1,7 +1,7 @@
 # Joe Sandbox v2
 
 Publisher: Splunk <br>
-Connector Version: 2.1.4 <br>
+Connector Version: 2.1.5 <br>
 Product Vendor: Joe Security LLC <br>
 Product Name: Joe Sandbox v2 <br>
 Minimum Product Version: 6.1.1
