@@ -37,6 +37,7 @@ except ImportError:
 from bs4 import BeautifulSoup
 
 from joesandboxv2_consts import *
+from joesandboxv2_report import get_nonempty_report_analysis
 
 
 class RetVal(tuple):
@@ -943,6 +944,10 @@ class JoeSandboxV2Connector(BaseConnector):
                 except Exception as e:
                     self._dump_error_log(e)
                     return action_result.set_status(phantom.APP_ERROR, JOE_ERR_JSON_MSG.format(error=self._get_err_msg_from_exception(e))), None
+
+        analysis_data = get_nonempty_report_analysis(response_data)
+        if analysis_data is None:
+            return action_result.set_status(phantom.APP_ERROR, JOE_ERR_EMPTY_JSON_REPORT_MSG), None
 
         # Required fields to be extracted from the response obtained
         overview_info_keys = {

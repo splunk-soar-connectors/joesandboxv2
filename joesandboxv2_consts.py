@@ -63,6 +63,7 @@ JOE_PCAP_REPORT_DOWNLOAD_MSG = "PCAP report downloaded successfully"
 JOE_ERR_ADDING_TO_VAULT_FAILED_MSG = "Error occurred while adding the file to vault"
 JOE_ERR_FILE_OR_COOKBOOK_NOT_FOUND_MSG = "Either the file or the cookbook for the provided hash not found in vault"
 JOE_ERR_REPORT_FILENAME_NOT_FOUND_MSG = 'Incorrect response format. Not able to find "Content-Disposition" in headers'
+JOE_ERR_EMPTY_JSON_REPORT_MSG = "The completed analysis did not return a nonempty JSON report"
 
 # JSON keys
 JOE_JSON_RESPONSE = "response"
